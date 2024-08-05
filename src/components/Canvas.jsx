@@ -51,6 +51,7 @@ const HierarchicalDiagram = () => (
       </div>
     </div>
   </div>
+  </div>
 );
 
 export default HierarchicalDiagram;
