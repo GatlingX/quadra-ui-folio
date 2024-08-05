@@ -72,13 +72,19 @@ const SourceCode = ({ files, setFiles }) => {
         </div>
       </div>
       <div className="flex-1 overflow-auto">
-        <textarea
-          value={files[activeFile].content}
-          onChange={handleChange}
-          className="w-full h-full bg-[#1e1e1e] text-white p-2 font-mono text-sm resize-none focus:outline-none"
-          placeholder="Enter your code here..."
-          spellCheck="false"
-        />
+        {files.length > 0 ? (
+          <textarea
+            value={files[activeFile].content}
+            onChange={handleChange}
+            className="w-full h-full bg-[#1e1e1e] text-white p-2 font-mono text-sm resize-none focus:outline-none"
+            placeholder="Enter your code here..."
+            spellCheck="false"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-500">
+            No file selected. Click on a skill to view its code.
+          </div>
+        )}
       </div>
     </div>
   );

@@ -10,26 +10,11 @@ import ShareDialog from '../components/ShareDialog';
 const Index = () => {
   const [consoleOutput, setConsoleOutput] = useState('');
   const [chatMessages, setChatMessages] = useState([]);
-  const [sourceFiles, setSourceFiles] = useState([
-    { name: 'index.js', content: '// Your code here' },
-    { name: 'styles.css', content: '/* Your styles here */' },
-  ]);
+  const [sourceFiles, setSourceFiles] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
 
   const handleNodeClick = (node) => {
-    const existingFileIndex = sourceFiles.findIndex(file => file.name === `${node.name}.js`);
-    if (existingFileIndex !== -1) {
-      setSourceFiles(prevFiles => [
-        ...prevFiles.slice(0, existingFileIndex),
-        ...prevFiles.slice(existingFileIndex + 1),
-        { name: `${node.name}.js`, content: node.content }
-      ]);
-    } else {
-      setSourceFiles(prevFiles => [
-        ...prevFiles,
-        { name: `${node.name}.js`, content: node.content }
-      ]);
-    }
+    setSourceFiles([{ name: `${node.name}.js`, content: node.content }]);
     setSelectedNode(node);
   };
 
