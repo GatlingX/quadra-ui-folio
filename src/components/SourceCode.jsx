@@ -1,17 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FileIcon, FileCode, FileJson, FileType, X } from 'lucide-react';
 import { FileSol } from './FileSol';
 
 const SourceCode = ({ files, setFiles }) => {
   const [activeFile, setActiveFile] = useState(0);
-
-  useEffect(() => {
-    if (files.length > 0) {
-      setActiveFile(files.length - 1);
-    } else {
-      setActiveFile(0);
-    }
-  }, [files.length]);
 
   const getFileIcon = (fileName) => {
     const extension = fileName.split('.').pop().toLowerCase();
@@ -42,8 +34,10 @@ const SourceCode = ({ files, setFiles }) => {
     event.stopPropagation();
     const newFiles = files.filter((_, i) => i !== index);
     setFiles(newFiles);
-    if (activeFile >= newFiles.length) {
-      setActiveFile(newFiles.length - 1);
+    if (activeFile === index) {
+      setActiveFile(Math.min(activeFile, newFiles.length - 1));
+    } else if (activeFile > index) {
+      setActiveFile(activeFile - 1);
     }
   };
 

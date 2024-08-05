@@ -14,7 +14,11 @@ const Index = () => {
   const [selectedNode, setSelectedNode] = useState(null);
 
   const handleNodeClick = (node) => {
-    setSourceFiles([{ name: `${node.name}.js`, content: node.content }]);
+    const newFile = { name: `${node.name}.js`, content: node.content };
+    setSourceFiles(prevFiles => {
+      const fileExists = prevFiles.some(file => file.name === newFile.name);
+      return fileExists ? prevFiles : [...prevFiles, newFile];
+    });
     setSelectedNode(node);
   };
 
