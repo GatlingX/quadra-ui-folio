@@ -1,7 +1,23 @@
 import React, { useState } from 'react';
+import { FileIcon, FileJs, FilePython, FileCode2 } from 'lucide-react';
 
 const SourceCode = ({ files, setFiles }) => {
   const [activeFile, setActiveFile] = useState(0);
+
+  const getFileIcon = (fileName) => {
+    const extension = fileName.split('.').pop().toLowerCase();
+    switch (extension) {
+      case 'js':
+      case 'jsx':
+        return <FileJs size={16} />;
+      case 'py':
+        return <FilePython size={16} />;
+      case 'sol':
+        return <FileCode2 size={16} />;
+      default:
+        return <FileIcon size={16} />;
+    }
+  };
 
   const handleChange = (e) => {
     const updatedFiles = [...files];
@@ -20,11 +36,12 @@ const SourceCode = ({ files, setFiles }) => {
           {files.map((file, index) => (
             <div
               key={index}
-              className={`px-3 py-1 mr-1 cursor-pointer rounded-t-lg ${
+              className={`px-3 py-1 mr-1 cursor-pointer rounded-t-lg flex items-center ${
                 index === activeFile ? 'bg-[#2d2d2d] text-white' : 'bg-[#252526] text-gray-400'
               }`}
               onClick={() => handleTabClick(index)}
             >
+              <span className="mr-2">{getFileIcon(file.name)}</span>
               {file.name}
             </div>
           ))}
