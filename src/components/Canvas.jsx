@@ -34,7 +34,7 @@ const SkillHierarchy = () => {
     const width = svgRef.current.clientWidth;
     const height = svgRef.current.clientHeight;
     const centerX = width / 2;
-    const centerY = height / 4;
+    const centerY = height / 6;
 
     const buildHierarchy = (node, x, y, angle, radius, level) => {
       const newNodes = [];
@@ -43,11 +43,11 @@ const SkillHierarchy = () => {
       newNodes.push({ id: node.name, x, y, name: node.name, level });
 
       if (node.children) {
-        const childAngle = angle / node.children.length;
+        const childAngle = Math.PI / (node.children.length + 1);
         node.children.forEach((child, index) => {
-          const childRadius = radius * 0.8;
-          const childX = x + Math.cos((index * childAngle) - (angle / 2)) * childRadius;
-          const childY = y + Math.sin((index * childAngle) - (angle / 2)) * childRadius + (level * 100);
+          const childRadius = radius * 1.2;
+          const childX = x + Math.cos((index + 1) * childAngle - Math.PI / 2) * childRadius;
+          const childY = y + Math.sin((index + 1) * childAngle - Math.PI / 2) * childRadius + (level * 150);
 
           newLinks.push({ source: node.name, target: child.name });
 
@@ -60,7 +60,7 @@ const SkillHierarchy = () => {
       return [newNodes, newLinks];
     };
 
-    const [newNodes, newLinks] = buildHierarchy(skillData, centerX, centerY, Math.PI, Math.min(width, height) / 3, 0);
+    const [newNodes, newLinks] = buildHierarchy(skillData, centerX, centerY, Math.PI, Math.min(width, height) / 4, 0);
     setNodes(newNodes);
     setLinks(newLinks);
   }, []);
