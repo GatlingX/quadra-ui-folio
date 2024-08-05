@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Console from '../components/Console';
 import ChatUI from '../components/ChatUI';
 import SourceCode from '../components/SourceCode';
-import Canvas from '../components/Canvas';
+import HierarchicalDiagram from '../components/Canvas';
 
 const Index = () => {
   const [consoleOutput, setConsoleOutput] = useState('');
@@ -16,7 +16,7 @@ const Index = () => {
         <Console output={consoleOutput} setOutput={setConsoleOutput} />
         <ChatUI messages={chatMessages} setMessages={setChatMessages} />
         <SourceCode code={sourceCode} setCode={setSourceCode} />
-        <Canvas sourceCode={sourceCode} />
+        <HierarchicalDiagram />
       </div>
     </div>
   );
