@@ -8,7 +8,10 @@ import SkillHierarchy from '../components/Canvas';
 const Index = () => {
   const [consoleOutput, setConsoleOutput] = useState('');
   const [chatMessages, setChatMessages] = useState([]);
-  const [sourceCode, setSourceCode] = useState('// Your code here');
+  const [sourceFiles, setSourceFiles] = useState([
+    { name: 'index.js', content: '// Your code here' },
+    { name: 'styles.css', content: '/* Your styles here */' },
+  ]);
 
   return (
     <div className="h-screen flex flex-col">
@@ -28,7 +31,7 @@ const Index = () => {
           <ChatUI messages={chatMessages} setMessages={setChatMessages} />
         </div>
         <div className="h-[calc(50vh-4rem)] overflow-hidden">
-          <SourceCode code={sourceCode} setCode={setSourceCode} />
+          <SourceCode files={sourceFiles} setFiles={setSourceFiles} />
         </div>
         <div className="h-[calc(50vh-4rem)] overflow-hidden">
           <SkillHierarchy />
