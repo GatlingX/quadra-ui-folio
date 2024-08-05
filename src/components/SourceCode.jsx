@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileIcon, FileJs, FilePython, FileCode2 } from 'lucide-react';
+import { FileIcon, FileCode, FileJson, FileType } from 'lucide-react';
 
 const SourceCode = ({ files, setFiles }) => {
   const [activeFile, setActiveFile] = useState(0);
@@ -9,11 +9,11 @@ const SourceCode = ({ files, setFiles }) => {
     switch (extension) {
       case 'js':
       case 'jsx':
-        return <FileJs size={16} />;
+        return <FileCode size={16} />;
       case 'py':
-        return <FilePython size={16} />;
+        return <FileType size={16} />;
       case 'sol':
-        return <FileCode2 size={16} />;
+        return <FileJson size={16} />;
       default:
         return <FileIcon size={16} />;
     }
