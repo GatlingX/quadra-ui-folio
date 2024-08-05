@@ -80,7 +80,7 @@ const SkillHierarchy = ({ onNodeClick, selectedNode }) => {
             <g
               key={node.id}
               transform={`translate(${node.x},${node.y})`}
-              onClick={() => onNodeClick({ name: node.name, content: node.content })}
+              onClick={() => onNodeClick(node)}
               style={{ cursor: 'pointer' }}
             >
               <circle 
