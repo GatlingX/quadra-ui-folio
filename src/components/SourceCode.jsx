@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FileIcon, FileCode, FileJson, FileType } from 'lucide-react';
+import { FileSol } from './FileSol';
 
 const SourceCode = ({ files, setFiles }) => {
   const [activeFile, setActiveFile] = useState(0);
@@ -13,7 +14,7 @@ const SourceCode = ({ files, setFiles }) => {
       case 'py':
         return <FileType size={16} />;
       case 'sol':
-        return <FileJson size={16} />;
+        return <FileSol size={16} />;
       default:
         return <FileIcon size={16} />;
     }
