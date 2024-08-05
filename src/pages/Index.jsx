@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Share2, Settings, GitBranch } from 'lucide-react';
+import { Settings, GitBranch } from 'lucide-react';
 import Console from '../components/Console';
 import ChatUI from '../components/ChatUI';
 import SourceCode from '../components/SourceCode';
 import SkillHierarchy from '../components/Canvas';
 import SettingsDialog from '../components/SettingsDialog';
+import ShareDialog from '../components/ShareDialog';
 
 const Index = () => {
   const [consoleOutput, setConsoleOutput] = useState('');
@@ -19,7 +20,7 @@ const Index = () => {
       <header className="flex justify-between items-center p-4 bg-gray-800 text-white">
         <h1 className="text-2xl font-bold">Hackerbot</h1>
         <div className="flex space-x-4">
-          <Share2 className="w-6 h-6 cursor-pointer" />
+          <ShareDialog />
           <SettingsDialog />
           <GitBranch className="w-6 h-6 cursor-pointer" />
         </div>
