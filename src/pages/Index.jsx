@@ -8,7 +8,6 @@ const Index = () => {
   const [consoleOutput, setConsoleOutput] = useState('');
   const [chatMessages, setChatMessages] = useState([]);
   const [sourceCode, setSourceCode] = useState('// Your code here');
-  const [canvasData, setCanvasData] = useState(null);
 
   return (
     <div className="h-screen flex flex-col">
@@ -17,7 +16,7 @@ const Index = () => {
         <Console output={consoleOutput} setOutput={setConsoleOutput} />
         <ChatUI messages={chatMessages} setMessages={setChatMessages} />
         <SourceCode code={sourceCode} setCode={setSourceCode} />
-        <Canvas data={canvasData} setData={setCanvasData} />
+        <Canvas sourceCode={sourceCode} />
       </div>
     </div>
   );

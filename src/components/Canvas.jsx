@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 
-const Canvas = ({ data, setData }) => {
+const Canvas = ({ sourceCode }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -10,20 +10,16 @@ const Canvas = ({ data, setData }) => {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw something (example: a rectangle)
-    ctx.fillStyle = 'blue';
-    ctx.fillRect(50, 50, 100, 100);
+    // Set font and color
+    ctx.font = '14px monospace';
+    ctx.fillStyle = 'black';
 
-    // You can add more drawing logic here based on the `data` prop
-  }, [data]);
-
-  const handleCanvasClick = (e) => {
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    setData({ x, y });
-    // You can add more logic here to draw on the canvas or update the data
-  };
+    // Render source code
+    const lines = sourceCode.split('\n');
+    lines.forEach((line, index) => {
+      ctx.fillText(line, 10, 20 + (index * 20));
+    });
+  }, [sourceCode]);
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md">
@@ -32,7 +28,6 @@ const Canvas = ({ data, setData }) => {
         ref={canvasRef}
         width={400}
         height={300}
-        onClick={handleCanvasClick}
         className="border border-gray-300 rounded"
       />
     </div>
