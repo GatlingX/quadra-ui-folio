@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { FileIcon, FileCode, FileJson, FileType, X } from 'lucide-react';
 import { FileSol } from './FileSol';
 
-const SourceCode = ({ files }) => {
+const SourceCode = ({ files, setFiles }) => {
+  const [activeFile, setActiveFile] = useState(0);
+
   const getFileIcon = (fileName) => {
     const extension = fileName.split('.').pop().toLowerCase();
     switch (extension) {
@@ -18,6 +20,27 @@ const SourceCode = ({ files }) => {
     }
   };
 
+  const handleChange = (e) => {
+    const updatedFiles = [...files];
+    updatedFiles[activeFile].content = e.target.value;
+    setFiles(updatedFiles);
+  };
+
+  const handleTabClick = (index) => {
+    setActiveFile(index);
+  };
+
+  const handleCloseTab = (index, event) => {
+    event.stopPropagation();
+    const newFiles = files.filter((_, i) => i !== index);
+    setFiles(newFiles);
+    if (activeFile === index) {
+      setActiveFile(Math.min(activeFile, newFiles.length - 1));
+    } else if (activeFile > index) {
+      setActiveFile(activeFile - 1);
+    }
+  };
+
   return (
     <div className="bg-[#1e1e1e] text-white p-4 rounded-lg flex flex-col h-full">
       <div className="flex items-center justify-between mb-2">
@@ -25,10 +48,18 @@ const SourceCode = ({ files }) => {
           {files.map((file, index) => (
             <div
               key={index}
-              className="px-3 py-1 mr-1 cursor-pointer rounded-t-lg flex items-center bg-[#2d2d2d] text-white"
+              className={`px-3 py-1 mr-1 cursor-pointer rounded-t-lg flex items-center ${
+                index === activeFile ? 'bg-[#2d2d2d] text-white' : 'bg-[#252526] text-gray-400'
+              }`}
+              onClick={() => handleTabClick(index)}
             >
               <span className="mr-2">{getFileIcon(file.name)}</span>
               {file.name}
+              <X
+                size={14}
+                className="ml-2 cursor-pointer"
+                onClick={(e) => handleCloseTab(index, e)}
+              />
             </div>
           ))}
         </div>
@@ -39,10 +70,14 @@ const SourceCode = ({ files }) => {
         </div>
       </div>
       <div className="flex-1 overflow-auto">
-        {files.length > 0 ? (
-          <pre className="w-full h-full bg-[#1e1e1e] text-white p-2 font-mono text-sm overflow-auto">
-            {files[0].content}
-          </pre>
+        {files.length > 0 && files[activeFile] ? (
+          <textarea
+            value={files[activeFile].content || ''}
+            onChange={handleChange}
+            className="w-full h-full bg-[#1e1e1e] text-white p-2 font-mono text-sm resize-none focus:outline-none"
+            placeholder="Enter your code here..."
+            spellCheck="false"
+          />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-500">
             No file selected. Click on a skill to view its code.
