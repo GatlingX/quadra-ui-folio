@@ -1,29 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const SkillHierarchy = () => {
+const SkillHierarchy = ({ onNodeClick }) => {
   const [nodes, setNodes] = useState([]);
   const [links, setLinks] = useState([]);
   const svgRef = useRef(null);
 
   const skillData = {
     name: 'Root Skill',
+    content: '// Root skill code',
     children: [
       {
         name: 'Skill 1',
+        content: '// Skill 1 code',
         children: [
-          { name: 'Skill 1.1' },
-          { name: 'Skill 1.2' },
+          { name: 'Skill 1.1', content: '// Skill 1.1 code' },
+          { name: 'Skill 1.2', content: '// Skill 1.2 code' },
         ],
       },
       {
         name: 'Skill 2',
+        content: '// Skill 2 code',
         children: [
-          { name: 'Skill 2.1' },
-          { name: 'Skill 2.2' },
+          { name: 'Skill 2.1', content: '// Skill 2.1 code' },
+          { name: 'Skill 2.2', content: '// Skill 2.2 code' },
         ],
       },
-      { name: 'Skill 3' },
-      { name: 'Skill 4' },
+      { name: 'Skill 3', content: '// Skill 3 code' },
+      { name: 'Skill 4', content: '// Skill 4 code' },
     ],
   };
 
@@ -74,7 +77,12 @@ const SkillHierarchy = () => {
             />
           ))}
           {nodes.map((node) => (
-            <g key={node.id} transform={`translate(${node.x},${node.y})`}>
+            <g
+              key={node.id}
+              transform={`translate(${node.x},${node.y})`}
+              onClick={() => onNodeClick(node)}
+              style={{ cursor: 'pointer' }}
+            >
               <circle r="5" fill={`hsl(${node.level * 30}, 70%, 60%)`} />
               <text
                 textAnchor="middle"

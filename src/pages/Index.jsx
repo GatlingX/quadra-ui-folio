@@ -15,6 +15,10 @@ const Index = () => {
     { name: 'styles.css', content: '/* Your styles here */' },
   ]);
 
+  const handleNodeClick = (node) => {
+    setSourceFiles([{ name: `${node.name}.js`, content: node.content }]);
+  };
+
   return (
     <div className="h-screen flex flex-col">
       <header className="flex justify-between items-center p-4 bg-gray-800 text-white">
@@ -36,7 +40,7 @@ const Index = () => {
           <SourceCode files={sourceFiles} setFiles={setSourceFiles} />
         </div>
         <div className="h-[calc(50vh-4rem)] overflow-hidden">
-          <SkillHierarchy />
+          <SkillHierarchy onNodeClick={handleNodeClick} />
         </div>
       </div>
     </div>
