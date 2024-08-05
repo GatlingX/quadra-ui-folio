@@ -6,73 +6,24 @@ const SkillHierarchy = () => {
   const svgRef = useRef(null);
 
   const skillData = {
-    name: 'Programming',
+    name: 'Root Skill',
     children: [
       {
-        name: 'Frontend',
+        name: 'Skill 1',
         children: [
-          {
-            name: 'JavaScript',
-            children: [
-              { name: 'React' },
-              { name: 'Vue' },
-              { name: 'Angular' },
-            ],
-          },
-          {
-            name: 'CSS',
-            children: [
-              { name: 'Sass' },
-              { name: 'Tailwind' },
-              { name: 'Bootstrap' },
-            ],
-          },
-          { name: 'HTML' },
+          { name: 'Skill 1.1' },
+          { name: 'Skill 1.2' },
         ],
       },
       {
-        name: 'Backend',
+        name: 'Skill 2',
         children: [
-          {
-            name: 'Python',
-            children: [
-              { name: 'Django' },
-              { name: 'Flask' },
-              { name: 'FastAPI' },
-            ],
-          },
-          {
-            name: 'Java',
-            children: [
-              { name: 'Spring' },
-              { name: 'Hibernate' },
-            ],
-          },
-          {
-            name: 'Node.js',
-            children: [
-              { name: 'Express' },
-              { name: 'Nest.js' },
-            ],
-          },
+          { name: 'Skill 2.1' },
+          { name: 'Skill 2.2' },
         ],
       },
-      {
-        name: 'Database',
-        children: [
-          { name: 'SQL' },
-          { name: 'NoSQL' },
-          { name: 'GraphQL' },
-        ],
-      },
-      {
-        name: 'DevOps',
-        children: [
-          { name: 'Docker' },
-          { name: 'Kubernetes' },
-          { name: 'CI/CD' },
-        ],
-      },
+      { name: 'Skill 3' },
+      { name: 'Skill 4' },
     ],
   };
 
@@ -80,22 +31,21 @@ const SkillHierarchy = () => {
     const width = svgRef.current.clientWidth;
     const height = svgRef.current.clientHeight;
 
-    const buildDendrogram = (node, x, y, level, maxWidth) => {
+    const buildDendrogram = (node, x, y, level) => {
       const newNodes = [];
       const newLinks = [];
 
       newNodes.push({ id: node.name, x, y, name: node.name, level });
 
       if (node.children) {
-        const childSpacing = maxWidth / (node.children.length + 1);
+        const childSpacing = width / (node.children.length + 1);
         node.children.forEach((child, index) => {
-          const childX = x - maxWidth / 2 + (index + 1) * childSpacing;
-          const childY = y + 80;
+          const childX = (index + 1) * childSpacing;
+          const childY = y + 100;
 
           newLinks.push({ source: { x, y }, target: { x: childX, y: childY } });
 
-          const childMaxWidth = maxWidth / node.children.length;
-          const [childNodes, childLinks] = buildDendrogram(child, childX, childY, level + 1, childMaxWidth);
+          const [childNodes, childLinks] = buildDendrogram(child, childX, childY, level + 1);
           newNodes.push(...childNodes);
           newLinks.push(...childLinks);
         });
@@ -104,7 +54,7 @@ const SkillHierarchy = () => {
       return [newNodes, newLinks];
     };
 
-    const [newNodes, newLinks] = buildDendrogram(skillData, width / 2, 50, 0, width * 0.9);
+    const [newNodes, newLinks] = buildDendrogram(skillData, width / 2, 50, 0);
     setNodes(newNodes);
     setLinks(newLinks);
   }, []);
@@ -112,8 +62,8 @@ const SkillHierarchy = () => {
   return (
     <div className="bg-white p-4 rounded-lg shadow-md h-full flex flex-col">
       <h2 className="text-xl font-bold mb-4">Skill Hierarchy</h2>
-      <div className="flex-1 overflow-auto">
-        <svg ref={svgRef} width="100%" height="1200">
+      <div className="flex-1 overflow-hidden">
+        <svg ref={svgRef} width="100%" height="100%">
           {links.map((link, index) => (
             <path
               key={index}
@@ -125,13 +75,13 @@ const SkillHierarchy = () => {
           ))}
           {nodes.map((node) => (
             <g key={node.id} transform={`translate(${node.x},${node.y})`}>
-              <circle r="4" fill={`hsl(${node.level * 30}, 70%, 60%)`} />
+              <circle r="5" fill={`hsl(${node.level * 30}, 70%, 60%)`} />
               <text
                 textAnchor="middle"
                 dy=".3em"
-                fontSize="10"
+                fontSize="12"
                 fill="black"
-                transform={`rotate(${node.level % 2 ? 45 : -45}) translate(0, ${node.level % 2 ? 12 : -12})`}
+                transform="translate(0, 15)"
               >
                 {node.name}
               </text>
