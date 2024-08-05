@@ -82,34 +82,36 @@ const ChatUI = ({ messages, setMessages }) => {
         ))}
         <div ref={messagesEndRef} />
       </div>
-      <div className="relative">
-        <textarea
-          ref={inputRef}
-          value={input}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          className="w-full p-2 border rounded resize-none"
-          placeholder="Type a message or / for commands..."
-          rows="2"
-        />
-        {showCommands && (
-          <div className="absolute bottom-full left-0 w-full bg-white border rounded shadow-lg">
-            {filteredCommands.map((cmd, index) => (
-              <div
-                key={cmd.name}
-                className={`p-2 hover:bg-gray-100 cursor-pointer ${index === selectedCommandIndex ? 'bg-gray-200' : ''}`}
-                onClick={() => {
-                  setInput(cmd.name + ' ');
-                  setShowCommands(false);
-                  inputRef.current.focus();
-                }}
-              >
-                <span className="font-bold">{cmd.name}</span> - {cmd.description}
-              </div>
-            ))}
-          </div>
-        )}
-        <button onClick={handleSend} className="absolute right-2 bottom-2 bg-blue-500 text-white p-2 rounded">Send</button>
+      <div className="flex items-end">
+        <div className="flex-grow relative">
+          <textarea
+            ref={inputRef}
+            value={input}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            className="w-full p-2 pr-16 border rounded resize-none"
+            placeholder="Type a message or / for commands..."
+            rows="2"
+          />
+          {showCommands && (
+            <div className="absolute bottom-full left-0 w-full bg-white border rounded shadow-lg">
+              {filteredCommands.map((cmd, index) => (
+                <div
+                  key={cmd.name}
+                  className={`p-2 hover:bg-gray-100 cursor-pointer ${index === selectedCommandIndex ? 'bg-gray-200' : ''}`}
+                  onClick={() => {
+                    setInput(cmd.name + ' ');
+                    setShowCommands(false);
+                    inputRef.current.focus();
+                  }}
+                >
+                  <span className="font-bold">{cmd.name}</span> - {cmd.description}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <button onClick={handleSend} className="ml-2 bg-blue-500 text-white p-2 rounded h-10">Send</button>
       </div>
     </div>
   );
