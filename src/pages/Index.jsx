@@ -4,6 +4,7 @@ import Console from '../components/Console';
 import ChatUI from '../components/ChatUI';
 import SourceCode from '../components/SourceCode';
 import SkillHierarchy from '../components/Canvas';
+import SettingsDialog from '../components/SettingsDialog';
 
 const Index = () => {
   const [consoleOutput, setConsoleOutput] = useState('');
@@ -19,7 +20,7 @@ const Index = () => {
         <h1 className="text-2xl font-bold">Hackerbot</h1>
         <div className="flex space-x-4">
           <Share2 className="w-6 h-6 cursor-pointer" />
-          <Settings className="w-6 h-6 cursor-pointer" />
+          <SettingsDialog />
           <GitBranch className="w-6 h-6 cursor-pointer" />
         </div>
       </header>
