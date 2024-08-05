@@ -14,19 +14,23 @@ const Index = () => {
   const [selectedNode, setSelectedNode] = useState(null);
 
   const handleNodeClick = (node) => {
-    const newFile = { name: `${node.name}.js`, content: node.content };
+    const fileName = `${node.name}.js`;
     setSourceFiles(prevFiles => {
-      const fileExists = prevFiles.some(file => file.name === newFile.name);
-      return fileExists ? prevFiles : [...prevFiles, newFile];
+      const fileIndex = prevFiles.findIndex(file => file.name === fileName);
+      if (fileIndex !== -1) {
+        // Update existing file
+        const updatedFiles = [...prevFiles];
+        updatedFiles[fileIndex] = { ...updatedFiles[fileIndex], content: node.content };
+        return updatedFiles;
+      } else {
+        // Add new file
+        return [...prevFiles, { name: fileName, content: node.content }];
+      }
     });
     setSelectedNode(node);
   };
 
-  useEffect(() => {
-    if (selectedNode) {
-      setConsoleOutput(prev => `${prev}\n// Selected skill: ${selectedNode.name}`);
-    }
-  }, [selectedNode]);
+  // Remove the useEffect hook that was updating the console output
 
   return (
     <div className="h-screen flex flex-col">
