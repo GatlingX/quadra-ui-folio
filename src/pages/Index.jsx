@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Settings, GitBranch } from 'lucide-react';
 import Console from '../components/Console';
 import ChatUI from '../components/ChatUI';
@@ -8,7 +8,7 @@ import SettingsDialog from '../components/SettingsDialog';
 import ShareDialog from '../components/ShareDialog';
 
 const Index = () => {
-  const [consoleOutput, setConsoleOutput] = useState('');
+  const [consoleOutput, setConsoleOutput] = useState('Welcome to Hackerbot Console!\nType "help" for available commands.');
   const [chatMessages, setChatMessages] = useState([]);
   const [sourceFiles, setSourceFiles] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
@@ -29,8 +29,6 @@ const Index = () => {
     });
     setSelectedNode(node);
   };
-
-  // Remove the useEffect hook that was updating the console output
 
   return (
     <div className="h-screen flex flex-col">
