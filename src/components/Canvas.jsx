@@ -1,29 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Folder, File } from 'lucide-react';
 
-const HierarchicalDiagram = () => {
+const SkillHierarchy = () => {
   const [nodes, setNodes] = useState([]);
   const [links, setLinks] = useState([]);
   const svgRef = useRef(null);
 
-  const treeData = {
-    name: 'Root',
+  const skillData = {
+    name: 'Root Skill',
+    level: 0,
     children: [
       {
-        name: 'src',
+        name: 'Skill 1',
+        level: 1,
         children: [
-          { name: 'components', children: [{ name: 'Button.jsx' }, { name: 'Input.jsx' }] },
-          { name: 'pages', children: [{ name: 'Home.jsx' }, { name: 'About.jsx' }] },
-          { name: 'App.jsx' },
-          { name: 'index.js' },
+          { name: 'Skill 1.1', level: 2 },
+          { name: 'Skill 1.2', level: 2 },
         ],
       },
       {
-        name: 'public',
-        children: [{ name: 'index.html' }, { name: 'favicon.ico' }],
+        name: 'Skill 2',
+        level: 1,
+        children: [
+          { name: 'Skill 2.1', level: 2 },
+          { name: 'Skill 2.2', level: 2 },
+        ],
       },
-      { name: 'package.json' },
-      { name: 'README.md' },
+      { name: 'Skill 3', level: 1 },
+      { name: 'Skill 4', level: 1 },
     ],
   };
 
@@ -31,24 +34,24 @@ const HierarchicalDiagram = () => {
     const width = svgRef.current.clientWidth;
     const height = svgRef.current.clientHeight;
     const centerX = width / 2;
-    const centerY = height / 2;
+    const centerY = height / 4;
 
-    const buildTree = (node, x, y, angle, radius) => {
+    const buildHierarchy = (node, x, y, angle, radius, level) => {
       const newNodes = [];
       const newLinks = [];
 
-      newNodes.push({ id: node.name, x, y, name: node.name });
+      newNodes.push({ id: node.name, x, y, name: node.name, level });
 
       if (node.children) {
         const childAngle = angle / node.children.length;
         node.children.forEach((child, index) => {
           const childRadius = radius * 0.8;
           const childX = x + Math.cos((index * childAngle) - (angle / 2)) * childRadius;
-          const childY = y + Math.sin((index * childAngle) - (angle / 2)) * childRadius;
+          const childY = y + Math.sin((index * childAngle) - (angle / 2)) * childRadius + (level * 100);
 
           newLinks.push({ source: node.name, target: child.name });
 
-          const [childNodes, childLinks] = buildTree(child, childX, childY, childAngle, childRadius);
+          const [childNodes, childLinks] = buildHierarchy(child, childX, childY, childAngle, childRadius, level + 1);
           newNodes.push(...childNodes);
           newLinks.push(...childLinks);
         });
@@ -57,14 +60,14 @@ const HierarchicalDiagram = () => {
       return [newNodes, newLinks];
     };
 
-    const [newNodes, newLinks] = buildTree(treeData, centerX, centerY, Math.PI * 2, Math.min(width, height) / 3);
+    const [newNodes, newLinks] = buildHierarchy(skillData, centerX, centerY, Math.PI, Math.min(width, height) / 3, 0);
     setNodes(newNodes);
     setLinks(newLinks);
   }, []);
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md h-full flex flex-col">
-      <h2 className="text-xl font-bold mb-4">Project Structure</h2>
+      <h2 className="text-xl font-bold mb-4">Skill Hierarchy</h2>
       <div className="flex-1 overflow-hidden">
         <svg ref={svgRef} width="100%" height="100%">
           {links.map((link, index) => (
@@ -80,12 +83,8 @@ const HierarchicalDiagram = () => {
           ))}
           {nodes.map((node) => (
             <g key={node.id} transform={`translate(${node.x},${node.y})`}>
-              {node.name.includes('.') ? (
-                <File className="w-6 h-6 text-gray-500" />
-              ) : (
-                <Folder className="w-6 h-6 text-yellow-500" />
-              )}
-              <text x="10" y="4" fontSize="12">{node.name}</text>
+              <circle r="20" fill={`hsl(${node.level * 30}, 70%, 60%)`} />
+              <text textAnchor="middle" dy=".3em" fontSize="12" fill="white">{node.name}</text>
             </g>
           ))}
         </svg>
@@ -94,4 +93,4 @@ const HierarchicalDiagram = () => {
   );
 };
 
-export default HierarchicalDiagram;
+export default SkillHierarchy;

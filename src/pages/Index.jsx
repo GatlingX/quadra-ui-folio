@@ -3,7 +3,7 @@ import { Share2, Settings, GitBranch } from 'lucide-react';
 import Console from '../components/Console';
 import ChatUI from '../components/ChatUI';
 import SourceCode from '../components/SourceCode';
-import HierarchicalDiagram from '../components/Canvas';
+import SkillHierarchy from '../components/Canvas';
 
 const Index = () => {
   const [consoleOutput, setConsoleOutput] = useState('');
@@ -31,7 +31,7 @@ const Index = () => {
           <SourceCode code={sourceCode} setCode={setSourceCode} />
         </div>
         <div className="h-[calc(50vh-4rem)] overflow-hidden">
-          <HierarchicalDiagram />
+          <SkillHierarchy />
         </div>
       </div>
     </div>
