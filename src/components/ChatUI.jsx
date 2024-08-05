@@ -89,9 +89,9 @@ const ChatUI = ({ messages, setMessages }) => {
             value={input}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            className="w-full p-2 pr-16 border rounded resize-none"
+            className="w-full p-1 pr-16 border rounded resize-none text-sm"
             placeholder="Type a message or / for commands..."
-            rows="2"
+            rows="1"
           />
           {showCommands && (
             <div className="absolute bottom-full left-0 w-full bg-white border rounded shadow-lg">
