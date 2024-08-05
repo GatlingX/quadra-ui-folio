@@ -89,7 +89,7 @@ const ChatUI = ({ messages, setMessages }) => {
             value={input}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            className="w-full p-1 pr-16 border rounded resize-none text-sm"
+            className="w-full p-2 pr-16 border rounded-l resize-none text-sm"
             placeholder="Type a message or / for commands..."
             rows="1"
           />
@@ -111,7 +111,7 @@ const ChatUI = ({ messages, setMessages }) => {
             </div>
           )}
         </div>
-        <button onClick={handleSend} className="ml-2 bg-blue-500 text-white p-2 rounded h-10">Send</button>
+        <button onClick={handleSend} className="bg-blue-500 text-white px-4 rounded-r">Send</button>
       </div>
     </div>
   );
