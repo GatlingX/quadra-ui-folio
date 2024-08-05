@@ -15,18 +15,7 @@ const Index = () => {
 
   const handleNodeClick = (node) => {
     const fileName = `${node.name}.js`;
-    setSourceFiles(prevFiles => {
-      const fileIndex = prevFiles.findIndex(file => file.name === fileName);
-      if (fileIndex !== -1) {
-        // Update existing file
-        const updatedFiles = [...prevFiles];
-        updatedFiles[fileIndex] = { ...updatedFiles[fileIndex], content: node.content };
-        return updatedFiles;
-      } else {
-        // Add new file
-        return [...prevFiles, { name: fileName, content: node.content }];
-      }
-    });
+    setSourceFiles([{ name: fileName, content: node.content }]);
     setSelectedNode(node);
   };
 
@@ -50,7 +39,7 @@ const Index = () => {
           <ChatUI messages={chatMessages} setMessages={setChatMessages} />
         </div>
         <div className="h-[calc(50vh-4rem)] overflow-hidden">
-          <SourceCode files={sourceFiles} setFiles={setSourceFiles} />
+          <SourceCode files={sourceFiles} />
         </div>
         <div className="h-[calc(50vh-4rem)] overflow-hidden">
           <SkillHierarchy onNodeClick={handleNodeClick} selectedNode={selectedNode} />
