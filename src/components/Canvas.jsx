@@ -9,7 +9,19 @@ const HierarchyNode = ({ title, children }) => (
       </div>
       <span className="mt-1 text-sm font-medium">{title}</span>
     </div>
-    {children && <div className="flex space-x-4">{children}</div>}
+    {children && (
+      <>
+        <div className="w-px h-4 bg-gray-300"></div>
+        <div className="flex space-x-8">
+          {React.Children.map(children, (child, index) => (
+            <div key={index} className="flex flex-col items-center">
+              <div className="w-px h-4 bg-gray-300"></div>
+              {child}
+            </div>
+          ))}
+        </div>
+      </>
+    )}
   </div>
 );
 
@@ -17,7 +29,7 @@ const HierarchicalDiagram = () => (
   <div className="bg-white p-4 rounded-lg shadow-md overflow-auto">
     <h2 className="text-xl font-bold mb-4">Hierarchical Diagram</h2>
     <div className="flex justify-center">
-      <HierarchyNode title="Root">
+      <div className="flex space-x-8">
         <HierarchyNode title="Node 1.1">
           <HierarchyNode title="Node 2.1">
             <HierarchyNode title="Node 3.1">
@@ -35,7 +47,7 @@ const HierarchicalDiagram = () => (
         <HierarchyNode title="Node 1.4" />
         <HierarchyNode title="Node 1.5" />
         <HierarchyNode title="Node 1.6" />
-      </HierarchyNode>
+      </div>
     </div>
   </div>
 );
