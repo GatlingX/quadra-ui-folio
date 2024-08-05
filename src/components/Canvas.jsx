@@ -2,26 +2,26 @@ import React from 'react';
 import { Image } from 'lucide-react';
 
 const HierarchyNode = ({ title, children }) => (
-  <div className="flex flex-col items-center">
-    <div className="flex flex-col items-center mb-2">
-      <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-        <Image className="w-6 h-6 text-gray-600" />
-      </div>
-      <span className="mt-1 text-sm font-medium">{title}</span>
-    </div>
+  <div className="flex flex-col-reverse items-center">
     {children && (
       <>
-        <div className="w-px h-4 bg-gray-300"></div>
-        <div className="flex space-x-8">
+        <div className="flex space-x-8 mt-4">
           {React.Children.map(children, (child, index) => (
-            <div key={index} className="flex flex-col items-center">
+            <div key={index} className="flex flex-col-reverse items-center">
               <div className="w-px h-4 bg-gray-300"></div>
               {child}
             </div>
           ))}
         </div>
+        <div className="w-px h-4 bg-gray-300"></div>
       </>
     )}
+    <div className="flex flex-col items-center mt-2">
+      <span className="mb-1 text-sm font-medium">{title}</span>
+      <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+        <Image className="w-6 h-6 text-gray-600" />
+      </div>
+    </div>
   </div>
 );
 
