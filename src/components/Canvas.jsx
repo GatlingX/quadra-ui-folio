@@ -1,32 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const SkillHierarchy = ({ onNodeClick }) => {
+const SkillHierarchy = ({ onNodeClick, selectedNode }) => {
   const [nodes, setNodes] = useState([]);
   const [links, setLinks] = useState([]);
   const svgRef = useRef(null);
 
   const skillData = {
     name: 'Root Skill',
-    content: '// Root skill code',
+    content: '// Root skill code\nconsole.log("This is the root skill");',
     children: [
       {
         name: 'Skill 1',
-        content: '// Skill 1 code',
+        content: '// Skill 1 code\nfunction skill1() {\n  console.log("This is skill 1");\n}',
         children: [
-          { name: 'Skill 1.1', content: '// Skill 1.1 code' },
-          { name: 'Skill 1.2', content: '// Skill 1.2 code' },
+          { name: 'Skill 1.1', content: '// Skill 1.1 code\nconst skill1_1 = () => {\n  console.log("This is skill 1.1");\n};' },
+          { name: 'Skill 1.2', content: '// Skill 1.2 code\nclass Skill1_2 {\n  constructor() {\n    console.log("This is skill 1.2");\n  }\n}' },
         ],
       },
       {
         name: 'Skill 2',
-        content: '// Skill 2 code',
+        content: '// Skill 2 code\nasync function skill2() {\n  console.log("This is skill 2");\n}',
         children: [
-          { name: 'Skill 2.1', content: '// Skill 2.1 code' },
-          { name: 'Skill 2.2', content: '// Skill 2.2 code' },
+          { name: 'Skill 2.1', content: '// Skill 2.1 code\nconst skill2_1 = async () => {\n  await new Promise(resolve => setTimeout(resolve, 1000));\n  console.log("This is skill 2.1");\n};' },
+          { name: 'Skill 2.2', content: '// Skill 2.2 code\nfunction* skill2_2() {\n  yield "This is skill 2.2";\n}' },
         ],
       },
-      { name: 'Skill 3', content: '// Skill 3 code' },
-      { name: 'Skill 4', content: '// Skill 4 code' },
+      { name: 'Skill 3', content: '// Skill 3 code\nconst skill3 = {\n  execute: () => console.log("This is skill 3")\n};' },
+      { name: 'Skill 4', content: '// Skill 4 code\nimport { useState } from "react";\n\nconst Skill4 = () => {\n  const [count, setCount] = useState(0);\n  return <button onClick={() => setCount(count + 1)}>Skill 4 Count: {count}</button>;\n};' },
     ],
   };
 
@@ -83,7 +83,10 @@ const SkillHierarchy = ({ onNodeClick }) => {
               onClick={() => onNodeClick(node)}
               style={{ cursor: 'pointer' }}
             >
-              <circle r="5" fill={`hsl(${node.level * 30}, 70%, 60%)`} />
+              <circle 
+                r="5" 
+                fill={selectedNode && selectedNode.name === node.name ? 'red' : `hsl(${node.level * 30}, 70%, 60%)`} 
+              />
               <text
                 textAnchor="middle"
                 dy=".3em"

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Settings, GitBranch } from 'lucide-react';
 import Console from '../components/Console';
 import ChatUI from '../components/ChatUI';
@@ -14,13 +14,30 @@ const Index = () => {
     { name: 'index.js', content: '// Your code here' },
     { name: 'styles.css', content: '/* Your styles here */' },
   ]);
+  const [selectedNode, setSelectedNode] = useState(null);
 
   const handleNodeClick = (node) => {
-    setSourceFiles(prevFiles => [
-      ...prevFiles,
-      { name: `${node.name}.js`, content: node.content }
-    ]);
+    const existingFileIndex = sourceFiles.findIndex(file => file.name === `${node.name}.js`);
+    if (existingFileIndex !== -1) {
+      setSourceFiles(prevFiles => [
+        ...prevFiles.slice(0, existingFileIndex),
+        ...prevFiles.slice(existingFileIndex + 1),
+        { name: `${node.name}.js`, content: node.content }
+      ]);
+    } else {
+      setSourceFiles(prevFiles => [
+        ...prevFiles,
+        { name: `${node.name}.js`, content: node.content }
+      ]);
+    }
+    setSelectedNode(node);
   };
+
+  useEffect(() => {
+    if (selectedNode) {
+      setConsoleOutput(prev => `${prev}\n// Selected skill: ${selectedNode.name}`);
+    }
+  }, [selectedNode]);
 
   return (
     <div className="h-screen flex flex-col">
@@ -43,7 +60,7 @@ const Index = () => {
           <SourceCode files={sourceFiles} setFiles={setSourceFiles} />
         </div>
         <div className="h-[calc(50vh-4rem)] overflow-hidden">
-          <SkillHierarchy onNodeClick={handleNodeClick} />
+          <SkillHierarchy onNodeClick={handleNodeClick} selectedNode={selectedNode} />
         </div>
       </div>
     </div>
