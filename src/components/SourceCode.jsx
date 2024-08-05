@@ -6,7 +6,11 @@ const SourceCode = ({ files, setFiles }) => {
   const [activeFile, setActiveFile] = useState(0);
 
   useEffect(() => {
-    setActiveFile(files.length - 1);
+    if (files.length > 0) {
+      setActiveFile(files.length - 1);
+    } else {
+      setActiveFile(0);
+    }
   }, [files.length]);
 
   const getFileIcon = (fileName) => {
@@ -72,9 +76,9 @@ const SourceCode = ({ files, setFiles }) => {
         </div>
       </div>
       <div className="flex-1 overflow-auto">
-        {files.length > 0 ? (
+        {files.length > 0 && files[activeFile] ? (
           <textarea
-            value={files[activeFile].content}
+            value={files[activeFile].content || ''}
             onChange={handleChange}
             className="w-full h-full bg-[#1e1e1e] text-white p-2 font-mono text-sm resize-none focus:outline-none"
             placeholder="Enter your code here..."
