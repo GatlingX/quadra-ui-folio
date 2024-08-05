@@ -55,7 +55,7 @@ const Console = ({ output, setOutput }) => {
   };
 
   return (
-    <div className="bg-black text-green-400 p-4 rounded-lg overflow-hidden flex flex-col h-full">
+    <div className="bg-black text-green-400 p-4 rounded-lg flex flex-col h-full">
       <h2 className="text-xl font-bold mb-2">Console</h2>
       <div className="flex-1 overflow-auto font-mono text-sm">
         <pre className="whitespace-pre-wrap">{output}</pre>

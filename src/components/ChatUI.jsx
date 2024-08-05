@@ -31,7 +31,7 @@ const ChatUI = ({ messages, setMessages }) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow-md flex flex-col h-full">
       <h2 className="text-xl font-bold mb-2">Chat</h2>
-      <div className="flex-1 overflow-auto mb-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+      <div className="flex-1 overflow-auto mb-4 pr-2">
         {messages.map((msg, index) => (
           <div key={index} className={`mb-2 ${msg.sender === 'user' ? 'text-right' : 'text-left'}`}>
             <span className={`inline-block p-2 rounded-lg ${msg.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>

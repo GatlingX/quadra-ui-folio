@@ -6,7 +6,7 @@ const SourceCode = ({ code, setCode }) => {
   };
 
   return (
-    <div className="bg-[#1e1e1e] text-white p-4 rounded-lg overflow-hidden flex flex-col h-full">
+    <div className="bg-[#1e1e1e] text-white p-4 rounded-lg flex flex-col h-full">
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-xl font-bold">Source Code</h2>
         <div className="flex space-x-2">
@@ -15,7 +15,7 @@ const SourceCode = ({ code, setCode }) => {
           <div className="w-3 h-3 rounded-full bg-green-500"></div>
         </div>
       </div>
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-auto">
         <textarea
           value={code}
           onChange={handleChange}

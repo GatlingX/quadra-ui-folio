@@ -21,10 +21,18 @@ const Index = () => {
         </div>
       </header>
       <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-2 p-2 bg-gray-100">
-        <Console output={consoleOutput} setOutput={setConsoleOutput} />
-        <ChatUI messages={chatMessages} setMessages={setChatMessages} />
-        <SourceCode code={sourceCode} setCode={setSourceCode} />
-        <HierarchicalDiagram />
+        <div className="overflow-hidden">
+          <Console output={consoleOutput} setOutput={setConsoleOutput} />
+        </div>
+        <div className="overflow-hidden">
+          <ChatUI messages={chatMessages} setMessages={setChatMessages} />
+        </div>
+        <div className="overflow-hidden">
+          <SourceCode code={sourceCode} setCode={setSourceCode} />
+        </div>
+        <div className="overflow-hidden">
+          <HierarchicalDiagram />
+        </div>
       </div>
     </div>
   );
