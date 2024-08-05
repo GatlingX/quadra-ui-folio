@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Settings, GitBranch } from 'lucide-react';
+import { Settings, GitBranch, Bot } from 'lucide-react';
 import Console from '../components/Console';
 import ChatUI from '../components/ChatUI';
 import SourceCode from '../components/SourceCode';
@@ -33,7 +33,10 @@ const Index = () => {
   return (
     <div className="h-screen flex flex-col">
       <header className="flex justify-between items-center p-4 bg-gray-800 text-white">
-        <h1 className="text-2xl font-bold">Hackerbot</h1>
+        <div className="flex items-center space-x-2">
+          <Bot className="w-8 h-8" />
+          <h1 className="text-2xl font-bold">Hackbot</h1>
+        </div>
         <div className="flex space-x-4">
           <ShareDialog />
           <SettingsDialog />
