@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Share2, Settings, GitBranch } from 'lucide-react';
 import Console from '../components/Console';
 import ChatUI from '../components/ChatUI';
 import SourceCode from '../components/SourceCode';
@@ -11,7 +12,14 @@ const Index = () => {
 
   return (
     <div className="h-screen flex flex-col">
-      <h1 className="text-2xl font-bold p-4 bg-gray-800 text-white">Devin-like Interface</h1>
+      <header className="flex justify-between items-center p-4 bg-gray-800 text-white">
+        <h1 className="text-2xl font-bold">Hackerbot</h1>
+        <div className="flex space-x-4">
+          <Share2 className="w-6 h-6 cursor-pointer" />
+          <Settings className="w-6 h-6 cursor-pointer" />
+          <GitBranch className="w-6 h-6 cursor-pointer" />
+        </div>
+      </header>
       <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-2 p-2 bg-gray-100">
         <Console output={consoleOutput} setOutput={setConsoleOutput} />
         <ChatUI messages={chatMessages} setMessages={setChatMessages} />
