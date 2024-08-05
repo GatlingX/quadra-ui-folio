@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
-import { FileIcon, FileCode, FileJson, FileType } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { FileIcon, FileCode, FileJson, FileType, X } from 'lucide-react';
 import { FileSol } from './FileSol';
 
 const SourceCode = ({ files, setFiles }) => {
   const [activeFile, setActiveFile] = useState(0);
+
+  useEffect(() => {
+    setActiveFile(files.length - 1);
+  }, [files.length]);
 
   const getFileIcon = (fileName) => {
     const extension = fileName.split('.').pop().toLowerCase();
@@ -30,10 +34,19 @@ const SourceCode = ({ files, setFiles }) => {
     setActiveFile(index);
   };
 
+  const handleCloseTab = (index, event) => {
+    event.stopPropagation();
+    const newFiles = files.filter((_, i) => i !== index);
+    setFiles(newFiles);
+    if (activeFile >= newFiles.length) {
+      setActiveFile(newFiles.length - 1);
+    }
+  };
+
   return (
     <div className="bg-[#1e1e1e] text-white p-4 rounded-lg flex flex-col h-full">
       <div className="flex items-center justify-between mb-2">
-        <div className="flex">
+        <div className="flex overflow-x-auto">
           {files.map((file, index) => (
             <div
               key={index}
@@ -44,6 +57,11 @@ const SourceCode = ({ files, setFiles }) => {
             >
               <span className="mr-2">{getFileIcon(file.name)}</span>
               {file.name}
+              <X
+                size={14}
+                className="ml-2 cursor-pointer"
+                onClick={(e) => handleCloseTab(index, e)}
+              />
             </div>
           ))}
         </div>

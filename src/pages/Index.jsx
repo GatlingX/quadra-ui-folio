@@ -16,7 +16,10 @@ const Index = () => {
   ]);
 
   const handleNodeClick = (node) => {
-    setSourceFiles([{ name: `${node.name}.js`, content: node.content }]);
+    setSourceFiles(prevFiles => [
+      ...prevFiles,
+      { name: `${node.name}.js`, content: node.content }
+    ]);
   };
 
   return (
