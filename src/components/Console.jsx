@@ -5,10 +5,15 @@ const Console = ({ output, setOutput }) => {
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef(null);
+  const outputRef = useRef(null);
 
   useEffect(() => {
     inputRef.current.focus();
   }, []);
+
+  useEffect(() => {
+    outputRef.current.scrollTop = outputRef.current.scrollHeight;
+  }, [output]);
 
   const handleInput = (e) => {
     if (e.key === 'Enter') {
@@ -55,12 +60,12 @@ const Console = ({ output, setOutput }) => {
   };
 
   return (
-    <div className="bg-black text-green-400 p-4 rounded-lg overflow-hidden flex flex-col h-full">
-      <h2 className="text-xl font-bold mb-2">Console</h2>
-      <div className="flex-1 overflow-auto font-mono text-sm">
+    <div className="bg-black text-green-400 p-2 rounded-lg overflow-hidden flex flex-col h-full">
+      <h2 className="text-lg font-bold mb-1">Console</h2>
+      <div ref={outputRef} className="flex-1 overflow-auto font-mono text-xs">
         <pre className="whitespace-pre-wrap">{output}</pre>
       </div>
-      <div className="flex items-center mt-2">
+      <div className="flex items-center mt-1">
         <span className="mr-2">$</span>
         <input
           ref={inputRef}

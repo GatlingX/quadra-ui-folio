@@ -29,12 +29,12 @@ const ChatUI = ({ messages, setMessages }) => {
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md flex flex-col h-full">
-      <h2 className="text-xl font-bold mb-2">Chat</h2>
-      <div className="flex-1 overflow-auto mb-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+    <div className="bg-white p-2 rounded-lg shadow-md flex flex-col h-full">
+      <h2 className="text-lg font-bold mb-1">Chat</h2>
+      <div className="flex-1 overflow-auto mb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
         {messages.map((msg, index) => (
-          <div key={index} className={`mb-2 ${msg.sender === 'user' ? 'text-right' : 'text-left'}`}>
-            <span className={`inline-block p-2 rounded-lg ${msg.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>
+          <div key={index} className={`mb-1 ${msg.sender === 'user' ? 'text-right' : 'text-left'}`}>
+            <span className={`inline-block p-1 rounded-lg text-sm ${msg.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>
               {msg.text}
             </span>
           </div>
@@ -42,15 +42,14 @@ const ChatUI = ({ messages, setMessages }) => {
         <div ref={messagesEndRef} />
       </div>
       <div className="flex">
-        <textarea
+        <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
-          className="flex-1 p-2 border rounded-l resize-none"
+          className="flex-1 p-1 border rounded-l text-sm"
           placeholder="Type a message..."
-          rows="2"
         />
-        <button onClick={handleSend} className="bg-blue-500 text-white p-2 rounded-r">Send</button>
+        <button onClick={handleSend} className="bg-blue-500 text-white px-2 py-1 rounded-r text-sm">Send</button>
       </div>
     </div>
   );

@@ -11,16 +11,16 @@ const Index = () => {
   const [sourceCode, setSourceCode] = useState('// Your code here');
 
   return (
-    <div className="h-screen flex flex-col">
-      <header className="flex justify-between items-center p-4 bg-gray-800 text-white">
-        <h1 className="text-2xl font-bold">Hackerbot</h1>
-        <div className="flex space-x-4">
-          <Share2 className="w-6 h-6 cursor-pointer" />
-          <Settings className="w-6 h-6 cursor-pointer" />
-          <GitBranch className="w-6 h-6 cursor-pointer" />
+    <div className="h-screen flex flex-col overflow-hidden">
+      <header className="flex justify-between items-center p-2 bg-gray-800 text-white">
+        <h1 className="text-xl font-bold">Hackerbot</h1>
+        <div className="flex space-x-2">
+          <Share2 className="w-5 h-5 cursor-pointer" />
+          <Settings className="w-5 h-5 cursor-pointer" />
+          <GitBranch className="w-5 h-5 cursor-pointer" />
         </div>
       </header>
-      <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-2 p-2 bg-gray-100">
+      <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-1 p-1 bg-gray-100">
         <Console output={consoleOutput} setOutput={setConsoleOutput} />
         <ChatUI messages={chatMessages} setMessages={setChatMessages} />
         <SourceCode code={sourceCode} setCode={setSourceCode} />

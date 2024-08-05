@@ -26,10 +26,10 @@ const HierarchyNode = ({ title, children }) => (
 );
 
 const HierarchicalDiagram = () => (
-  <div className="bg-white p-4 rounded-lg shadow-md overflow-auto">
-    <h2 className="text-xl font-bold mb-4">Hierarchical Diagram</h2>
-    <div className="flex justify-center">
-      <div className="flex space-x-8">
+  <div className="bg-white p-2 rounded-lg shadow-md overflow-auto h-full">
+    <h2 className="text-lg font-bold mb-2">Hierarchical Diagram</h2>
+    <div className="flex justify-center h-[calc(100%-2rem)]">
+      <div className="flex space-x-4 transform scale-75 origin-top">
         <HierarchyNode title="Node 1.1">
           <HierarchyNode title="Node 2.1">
             <HierarchyNode title="Node 3.1">
