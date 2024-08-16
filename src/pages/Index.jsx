@@ -6,6 +6,7 @@ import SourceCode from '../components/SourceCode';
 import SkillHierarchy from '../components/Canvas';
 import SettingsDialog from '../components/SettingsDialog';
 import ShareDialog from '../components/ShareDialog';
+import InfoDialog from '../components/InfoDialog';
 
 const Index = () => {
   const [consoleOutput, setConsoleOutput] = useState('Welcome to Hackerbot Console!\nType "help" for available commands.');
@@ -41,6 +42,7 @@ const Index = () => {
           <ShareDialog />
           <SettingsDialog />
           <GitBranch className="w-6 h-6 cursor-pointer" />
+          <InfoDialog />
         </div>
       </header>
       <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-2 p-2 bg-gray-100">
