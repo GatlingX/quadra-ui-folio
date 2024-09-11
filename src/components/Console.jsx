@@ -84,12 +84,15 @@ const Console = ({ output, setOutput }) => {
   const handleHackRepo = async (repoUrl) => {
     setOutput(prev => `${prev}\n${colorText('Sending hack request to backend...', 'yellow')}`);
     try {
-      const data = await hackRepo(repoUrl);
-      if (data.message) {
-        setOutput(prev => `${prev}\n${colorText(`Backend response: ${data.message}`, 'green')}`);
-        setOutput(prev => `${prev}\n${colorText(`Analyzed repo: ${data.repo}`, 'cyan')}`);
-      } else {
-        setOutput(prev => `${prev}\n${colorText(`Error: ${data.error || 'Unknown error occurred'}`, 'red')}`);
+      const stream = await hackRepo(repoUrl);
+      for await (const data of stream) {
+        if (data.message) {
+          setOutput(prev => `${prev}\n${colorText(data.message, 'cyan')}`);
+        } else if (data.bug_list && data.total_score !== undefined) {
+          setOutput(prev => `${prev}\n${colorText('Analysis complete:', 'green')}`);
+          setOutput(prev => `${prev}\n${colorText(`Bug list: ${JSON.stringify(data.bug_list)}`, 'yellow')}`);
+          setOutput(prev => `${prev}\n${colorText(`Total score: ${data.total_score}`, 'yellow')}`);
+        }
       }
     } catch (error) {
       console.error('Fetch error:', error);

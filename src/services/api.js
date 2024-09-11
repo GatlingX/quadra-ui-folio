@@ -25,11 +25,37 @@ async function apiRequest(endpoint, method = 'GET', body = null) {
 
 // API functions
 export async function hackRepo(repoUrl) {
-  const { response, responseData } = await apiRequest('/api/hack', 'POST', { repo_url: repoUrl });
+  const response = await fetch(`${API_BASE_URL}/api/hack`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ repo_url: repoUrl }),
+    credentials: 'include',
+  });
+
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
-  return JSON.parse(responseData);
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+
+  return {
+    async *[Symbol.asyncIterator]() {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        const decodedChunk = decoder.decode(value, { stream: true });
+        const lines = decodedChunk.split('\n\n');
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            yield JSON.parse(line.slice(6));
+          }
+        }
+      }
+    },
+  };
 }
 
 export async function pingBackend() {
