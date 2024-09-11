@@ -7,6 +7,7 @@ const Console = ({ output, setOutput }) => {
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef(null);
   const outputRef = useRef(null);
+  const consoleRef = useRef(null);
 
   useEffect(() => {
     inputRef.current.focus();
@@ -15,6 +16,10 @@ const Console = ({ output, setOutput }) => {
   useEffect(() => {
     outputRef.current.scrollTop = outputRef.current.scrollHeight;
   }, [output]);
+
+  const handleConsoleClick = () => {
+    inputRef.current.focus();
+  };
 
   const handleInput = async (e) => {
     if (e.key === 'Enter') {
@@ -130,7 +135,11 @@ const Console = ({ output, setOutput }) => {
   };
 
   return (
-    <div className="bg-black text-green-400 p-4 rounded-lg flex flex-col h-full">
+    <div 
+      ref={consoleRef}
+      className="bg-black text-green-400 p-4 rounded-lg flex flex-col h-full"
+      onClick={handleConsoleClick}
+    >
       <h2 className="text-xl font-bold mb-2">Console</h2>
       <div ref={outputRef} className="flex-1 overflow-auto font-mono text-sm">
         <pre className="whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: output }}></pre>
