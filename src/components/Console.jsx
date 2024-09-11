@@ -45,22 +45,31 @@ const Console = ({ output, setOutput }) => {
     }
   };
 
+  const colorText = (text, color) => `<span class="text-${color}-400">${text}</span>`;
+
   const executeCommand = async (command) => {
-    switch (command.toLowerCase()) {
-      case 'clear':
-        setOutput('');
-        break;
-      case 'date':
-        setOutput(prev => `${prev}\n${new Date().toString()}`);
-        break;
-      case 'help':
-        setOutput(prev => `${prev}\nAvailable commands: clear, date, help, stream`);
-        break;
-      case 'stream':
-        await simulateStreamingData();
-        break;
-      default:
-        setOutput(prev => `${prev}\nCommand not found: ${command}`);
+    if (command.toLowerCase().startsWith('hack ')) {
+      const link = command.slice(5).trim();
+      setOutput(prev => `${prev}\n${colorText(`Attempting to hack: ${link}`, 'yellow')}`);
+      // Here you would implement the actual hacking logic
+      setOutput(prev => `${prev}\n${colorText(`Hacking attempt completed for ${link}`, 'yellow')}`);
+    } else {
+      switch (command.toLowerCase()) {
+        case 'clear':
+          setOutput('');
+          break;
+        case 'date':
+          setOutput(prev => `${prev}\n${new Date().toString()}`);
+          break;
+        case 'help':
+          setOutput(prev => `${prev}\nAvailable commands: clear, date, help, stream, hack <link>`);
+          break;
+        case 'stream':
+          await simulateStreamingData();
+          break;
+        default:
+          setOutput(prev => `${prev}\nCommand not found: ${command}`);
+      }
     }
   };
 
@@ -76,7 +85,7 @@ const Console = ({ output, setOutput }) => {
     <div className="bg-black text-green-400 p-4 rounded-lg flex flex-col h-full">
       <h2 className="text-xl font-bold mb-2">Console</h2>
       <div ref={outputRef} className="flex-1 overflow-auto font-mono text-sm">
-        <pre className="whitespace-pre-wrap">{output}</pre>
+        <pre className="whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: output }}></pre>
       </div>
       <div className="flex items-center mt-2">
         <span className="mr-2">$</span>
