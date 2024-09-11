@@ -67,9 +67,52 @@ const Console = ({ output, setOutput }) => {
         case 'stream':
           await simulateStreamingData();
           break;
+        case 'ping':
+          await pingBackend();
+          break;
         default:
           setOutput(prev => `${prev}\nCommand not found: ${command}`);
       }
+    }
+  };
+
+  const pingBackend = async () => {
+    setOutput(prev => `${prev}\n${colorText('Pinging backend...', 'yellow')}`);
+    try {
+      const start = Date.now();
+      const response = await fetch('http://127.0.0.1:5000/ping', {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+      const end = Date.now();
+      const latency = end - start;
+      
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+      
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+      
+      if (response.ok) {
+        try {
+          const data = JSON.parse(responseText);
+          setOutput(prev => `${prev}\n${colorText(`Backend responded: ${data.message}`, 'green')}`);
+          setOutput(prev => `${prev}\n${colorText(`Latency: ${latency}ms`, 'cyan')}`);
+        } catch (parseError) {
+          console.error('Error parsing JSON:', parseError);
+          setOutput(prev => `${prev}\n${colorText(`Error parsing response: ${parseError.message}`, 'red')}`);
+        }
+      } else {
+        setOutput(prev => `${prev}\n${colorText(`Error: Backend responded with status ${response.status}`, 'red')}`);
+        setOutput(prev => `${prev}\n${colorText(`Response: ${responseText}`, 'red')}`);
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+      setOutput(prev => `${prev}\n${colorText(`Error: ${error.message}`, 'red')}`);
+      setOutput(prev => `${prev}\n${colorText('Check browser console for more details.', 'yellow')}`);
     }
   };
 
