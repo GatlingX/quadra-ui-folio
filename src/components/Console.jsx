@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { hackRepo, pingBackend } from '../services/api';
 
 const Console = ({ output, setOutput }) => {
   const [history, setHistory] = useState([]);
@@ -49,10 +50,9 @@ const Console = ({ output, setOutput }) => {
 
   const executeCommand = async (command) => {
     if (command.toLowerCase().startsWith('hack ')) {
-      const link = command.slice(5).trim();
-      setOutput(prev => `${prev}\n${colorText(`Attempting to hack: ${link}`, 'yellow')}`);
-      // Here you would implement the actual hacking logic
-      setOutput(prev => `${prev}\n${colorText(`Hacking attempt completed for ${link}`, 'yellow')}`);
+      const repoUrl = command.slice(5).trim();
+      setOutput(prev => `${prev}\n${colorText(`Attempting to hack: ${repoUrl}`, 'yellow')}`);
+      await handleHackRepo(repoUrl);
     } else {
       switch (command.toLowerCase()) {
         case 'clear':
@@ -68,7 +68,7 @@ const Console = ({ output, setOutput }) => {
           await simulateStreamingData();
           break;
         case 'ping':
-          await pingBackend();
+          await handlePingBackend();
           break;
         default:
           setOutput(prev => `${prev}\nCommand not found: ${command}`);
@@ -76,29 +76,34 @@ const Console = ({ output, setOutput }) => {
     }
   };
 
-  const pingBackend = async () => {
+  const handleHackRepo = async (repoUrl) => {
+    setOutput(prev => `${prev}\n${colorText('Sending hack request to backend...', 'yellow')}`);
+    try {
+      const data = await hackRepo(repoUrl);
+      if (data.message) {
+        setOutput(prev => `${prev}\n${colorText(`Backend response: ${data.message}`, 'green')}`);
+        setOutput(prev => `${prev}\n${colorText(`Analyzed repo: ${data.repo}`, 'cyan')}`);
+      } else {
+        setOutput(prev => `${prev}\n${colorText(`Error: ${data.error || 'Unknown error occurred'}`, 'red')}`);
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+      setOutput(prev => `${prev}\n${colorText(`Error: ${error.message}`, 'red')}`);
+      setOutput(prev => `${prev}\n${colorText('Check browser console for more details.', 'yellow')}`);
+    }
+  };
+
+  const handlePingBackend = async () => {
     setOutput(prev => `${prev}\n${colorText('Pinging backend...', 'yellow')}`);
     try {
-      const start = Date.now();
-      const response = await fetch('http://127.0.0.1:5000/ping', {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Accept': 'application/json',
-        },
-      });
-      const end = Date.now();
-      const latency = end - start;
+      const { status, ok, responseData, latency } = await pingBackend();
       
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
+      console.log('Response status:', status);
+      console.log('Response data:', responseData);
       
-      const responseText = await response.text();
-      console.log('Response text:', responseText);
-      
-      if (response.ok) {
+      if (ok) {
         try {
-          const data = JSON.parse(responseText);
+          const data = JSON.parse(responseData);
           setOutput(prev => `${prev}\n${colorText(`Backend responded: ${data.message}`, 'green')}`);
           setOutput(prev => `${prev}\n${colorText(`Latency: ${latency}ms`, 'cyan')}`);
         } catch (parseError) {
@@ -106,8 +111,8 @@ const Console = ({ output, setOutput }) => {
           setOutput(prev => `${prev}\n${colorText(`Error parsing response: ${parseError.message}`, 'red')}`);
         }
       } else {
-        setOutput(prev => `${prev}\n${colorText(`Error: Backend responded with status ${response.status}`, 'red')}`);
-        setOutput(prev => `${prev}\n${colorText(`Response: ${responseText}`, 'red')}`);
+        setOutput(prev => `${prev}\n${colorText(`Error: Backend responded with status ${status}`, 'red')}`);
+        setOutput(prev => `${prev}\n${colorText(`Response: ${responseData}`, 'red')}`);
       }
     } catch (error) {
       console.error('Fetch error:', error);
