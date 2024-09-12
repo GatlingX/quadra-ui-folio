@@ -70,7 +70,7 @@ const Console = ({ output, setOutput }) => {
   const executeCommand = async (command) => {
     if (command.toLowerCase().startsWith('hack ')) {
       const repoUrl = command.slice(5).trim();
-      setOutput(prev => `${prev}\n${colorText(`Attempting to hack: ${repoUrl}`, 'yellow')}`);
+      setOutput(prev => `${prev}\n${colorText(`Attempting to hack: ${repoUrl}`, 'white')}`);
       await handleHackRepo(repoUrl);
     } else {
       switch (command.toLowerCase()) {
@@ -78,7 +78,7 @@ const Console = ({ output, setOutput }) => {
           setOutput('');
           break;
         case 'date':
-          setOutput(prev => `${prev}\n${new Date().toString()}`);
+          setOutput(prev => `${prev}\n${colorText(new Date().toString(), 'white')}`);
           break;
         case 'help':
           setOutput(prev => `${prev}\nAvailable commands: clear, date, help, stream, hack <link>`);
@@ -96,7 +96,7 @@ const Console = ({ output, setOutput }) => {
   };
 
   const handleHackRepo = async (repoUrl) => {
-    setOutput(prev => `${prev}\n${colorText('Sending hack request to backend...', 'yellow')}`);
+    setOutput(prev => `${prev}\n${colorText('Sending hack request to backend...', 'white')}`);
     try {
       const stream = await hackRepo(repoUrl);
       for await (const data of stream) {
@@ -116,7 +116,7 @@ const Console = ({ output, setOutput }) => {
   };
 
   const handlePingBackend = async () => {
-    setOutput(prev => `${prev}\n${colorText('Pinging backend...', 'yellow')}`);
+    setOutput(prev => `${prev}\n${colorText('Pinging backend...', 'white')}`);
     try {
       const { status, ok, responseData, latency } = await pingBackend();
       
@@ -126,8 +126,8 @@ const Console = ({ output, setOutput }) => {
       if (ok) {
         try {
           const data = JSON.parse(responseData);
-          setOutput(prev => `${prev}\n${colorText(`Backend responded: ${data.message}`, 'green')}`);
-          setOutput(prev => `${prev}\n${colorText(`Latency: ${latency}ms`, 'cyan')}`);
+          setOutput(prev => `${prev}\n${colorText(`Backend responded: ${data.message}`, 'white')}`);
+          setOutput(prev => `${prev}\n${colorText(`Latency: ${latency}ms`, 'white')}`);
         } catch (parseError) {
           console.error('Error parsing JSON:', parseError);
           setOutput(prev => `${prev}\n${colorText(`Error parsing response: ${parseError.message}`, 'red')}`);
