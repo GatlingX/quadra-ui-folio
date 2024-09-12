@@ -1,5 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { hackRepo, pingBackend } from '../services/api';
+import Convert from 'ansi-to-html';
+
+const convert = new Convert();
 
 const Console = ({ output, setOutput }) => {
   const [history, setHistory] = useState([]);
@@ -51,7 +54,18 @@ const Console = ({ output, setOutput }) => {
     }
   };
 
-  const colorText = (text, color) => `<span class="text-${color}-400">${text}</span>`;
+  const colorText = (text, color) => {
+    const colorCodes = {
+      red: '\x1b[31m',
+      green: '\x1b[32m',
+      yellow: '\x1b[33m',
+      blue: '\x1b[34m',
+      magenta: '\x1b[35m',
+      cyan: '\x1b[36m',
+      white: '\x1b[37m',
+    };
+    return `${colorCodes[color]}${text}\x1b[0m`;
+  };
 
   const executeCommand = async (command) => {
     if (command.toLowerCase().startsWith('hack ')) {
@@ -144,8 +158,8 @@ const Console = ({ output, setOutput }) => {
       onClick={handleConsoleClick}
     >
       <h2 className="text-xl font-bold mb-2">Console</h2>
-      <div ref={outputRef} className="flex-1 overflow-auto font-mono text-sm">
-        <pre className="whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: output }}></pre>
+      <div ref={outputRef} className="flex-1 overflow-auto font-mono text-sm whitespace-pre-wrap">
+        <div dangerouslySetInnerHTML={{ __html: convert.toHtml(output) }}></div>
       </div>
       <div className="flex items-center mt-2">
         <span className="mr-2">$</span>
