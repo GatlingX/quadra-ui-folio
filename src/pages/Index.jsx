@@ -47,7 +47,7 @@ const Index = () => {
       </header>
       <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-2 p-2 bg-gray-100">
         <div className="h-[calc(50vh-4rem)] overflow-hidden">
-          <Console output={consoleOutput} setOutput={setConsoleOutput} />
+          <Console output={consoleOutput} setOutput={setConsoleOutput} messages={chatMessages} setMessages={setChatMessages} />
         </div>
         <div className="h-[calc(50vh-4rem)] overflow-hidden">
           <ChatUI messages={chatMessages} setMessages={setChatMessages} />

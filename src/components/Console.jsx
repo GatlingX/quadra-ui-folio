@@ -4,7 +4,7 @@ import Convert from 'ansi-to-html';
 
 const convert = new Convert();
 
-const Console = ({ output, setOutput }) => {
+const Console = ({ output, setOutput, messages, setMessages }) => {
   const [history, setHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [inputValue, setInputValue] = useState('');
@@ -129,6 +129,14 @@ const Console = ({ output, setOutput }) => {
           const data = JSON.parse(responseData);
           setOutput(prev => `${prev}\n${colorText(`Backend responded: ${data.message}`, 'white')}`);
           setOutput(prev => `${prev}\n${colorText(`Latency: ${latency}ms`, 'white')}`);
+          const responseMessage = `Backend responded: ${data.message}\nLatency: ${latency}ms`;
+          setOutput(prev => `${prev}\n${colorText(responseMessage, 'white')}`);
+          
+          // Add the ping response to the chat messages
+          setMessages(prev => [...messages, 
+            { sender: 'user', text: 'ping' },
+            { sender: 'ai', text: 'pong' }
+          ]);
         } catch (parseError) {
           console.error('Error parsing JSON:', parseError);
           setOutput(prev => `${prev}\n${colorText(`Error parsing response: ${parseError.message}`, 'red')}`);
