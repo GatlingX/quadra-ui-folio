@@ -52,7 +52,7 @@ const Index = () => {
       <header className="flex justify-between items-center p-4 bg-gray-800 text-white">
         <div className="flex items-center space-x-2">
           <Bot className="w-8 h-8" />
-          <h1 className="text-2xl font-bold">Hackbot</h1>
+          <h1 className="text-2xl font-bold">Gatling Hackbot</h1>
         </div>
         <div className="flex space-x-4">
           <ShareDialog />
