@@ -125,8 +125,9 @@ const Console = ({ output, setOutput, messages, setMessages }) => {
                 { sender: 'ai', text: bug.trim() }
               ]);
             });
+          }else{
+            setOutput(prev => `${prev}\n${colorText(data.message, 'cyan')}`);
           }
-          // setOutput(prev => `${prev}\n${colorText(data.message, 'cyan')}`);
         } else if (data.bug_list && data.bug_titles && data.total_score !== undefined) {
           setOutput(prev => `${prev}\n${colorText('Analysis complete:', 'green')}`);
           setOutput(prev => `${prev}\n${colorText(`Bug list: ${JSON.stringify(data.bug_titles)}`, 'yellow')}`);
