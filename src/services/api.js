@@ -29,6 +29,7 @@ export async function hackRepo(repoUrl) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'text/event-stream',
     },
     body: JSON.stringify({ repo_url: repoUrl }),
     credentials: 'include',
@@ -38,20 +39,38 @@ export async function hackRepo(repoUrl) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
 
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-
   return {
     async *[Symbol.asyncIterator]() {
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
-        const decodedChunk = decoder.decode(value, { stream: true });
-        const lines = decodedChunk.split('\n\n');
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n\n');
+        buffer = lines.pop();
+
         for (const line of lines) {
           if (line.startsWith('data: ')) {
-            yield JSON.parse(line.slice(6));
+            try {
+              const data = JSON.parse(line.slice(5));
+              yield data;
+            } catch (error) {
+              console.error('Error parsing JSON:', error);
+            }
           }
+        }
+      }
+
+      if (buffer.startsWith('data: ')) {
+        try {
+          const data = JSON.parse(buffer.slice(5));
+          yield data;
+        } catch (error) {
+          console.error('Error parsing JSON:', error);
         }
       }
     },

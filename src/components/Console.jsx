@@ -99,12 +99,13 @@ const Console = ({ output, setOutput }) => {
     setOutput(prev => `${prev}\n${colorText('Sending hack request to backend...', 'white')}`);
     try {
       const stream = await hackRepo(repoUrl);
+      // Handling the stream of data from the backend
       for await (const data of stream) {
         if (data.message) {
           setOutput(prev => `${prev}\n${colorText(data.message, 'cyan')}`);
-        } else if (data.bug_list && data.total_score !== undefined) {
+        } else if (data.bug_list && data.bug_titles && data.total_score !== undefined) {
           setOutput(prev => `${prev}\n${colorText('Analysis complete:', 'green')}`);
-          setOutput(prev => `${prev}\n${colorText(`Bug list: ${JSON.stringify(data.bug_list)}`, 'yellow')}`);
+          setOutput(prev => `${prev}\n${colorText(`Bug list: ${JSON.stringify(data.bug_titles)}`, 'yellow')}`);
           setOutput(prev => `${prev}\n${colorText(`Total score: ${data.total_score}`, 'yellow')}`);
         }
       }
