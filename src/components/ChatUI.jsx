@@ -8,7 +8,7 @@ const commands = [
   { name: '/run', description: 'Run code in console' },
 ];
 
-const ChatUI = ({ messages, setMessages, setSourceFiles }) => {
+const ChatUI = ({ messages, setMessages, setSourceFiles, setBugReport }) => {
   const [input, setInput] = useState('');
   const [showCommands, setShowCommands] = useState(false);
   const [filteredCommands, setFilteredCommands] = useState(commands);
@@ -69,6 +69,13 @@ const ChatUI = ({ messages, setMessages, setSourceFiles }) => {
     }
   };
 
+  const handleFileClick = (filePath, displayText) => {
+    // You'll need to implement this function to handle file clicks
+    console.log(`File clicked: ${filePath} for ${displayText}`);
+    setBugReport(filePath, displayText);
+    // For example, you might want to open the file in an editor or display its contents
+  };
+
   const renderMessage = (msg) => {
     const match = msg.text.match(/^(.*?): \[(.*?)\]\((.*?)\)$/);
     if (match) {
@@ -88,9 +95,6 @@ const ChatUI = ({ messages, setMessages, setSourceFiles }) => {
       .filter(result => result.filePath)
       .map(result => result.filePath);
     
-    if (newSourceFiles.length > 0) {
-      setSourceFiles(prev => [...new Set([...prev, ...newSourceFiles])]);
-    }
   }, [messages, setSourceFiles]);
 
   return (
@@ -104,7 +108,13 @@ const ChatUI = ({ messages, setMessages, setSourceFiles }) => {
               <span className={`inline-block p-2 rounded-lg ${msg.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>
                 {renderedMessage.prefix ? (
                   <>
-                    {renderedMessage.prefix}: <u>{renderedMessage.displayText}</u>
+                    {renderedMessage.prefix}:{' '}
+                    <span 
+                      className="underline cursor-pointer"
+                      onClick={() => handleFileClick(renderedMessage.filePath, renderedMessage.displayText)}
+                    >
+                      {renderedMessage.displayText}
+                    </span>
                   </>
                 ) : renderedMessage.text}
               </span>

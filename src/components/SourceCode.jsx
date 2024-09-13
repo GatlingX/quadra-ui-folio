@@ -6,12 +6,13 @@ const SourceCode = ({ files, setFiles }) => {
   const [activeFile, setActiveFile] = useState(0);
 
   const getFileIcon = (fileName) => {
+    if (!fileName) return null;
     const extension = fileName.split('.').pop().toLowerCase();
     switch (extension) {
       case 'js':
       case 'jsx':
         return <FileCode size={16} />;
-      case 'py':
+      case 'md':
         return <FileType size={16} />;
       case 'sol':
         return <FileSol size={16} />;
@@ -80,7 +81,7 @@ const SourceCode = ({ files, setFiles }) => {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-500">
-            No file selected. Click on a skill to view its code.
+            No file selected.
           </div>
         )}
       </div>

@@ -112,8 +112,10 @@ const Console = ({ output, setOutput, messages, setMessages }) => {
               parsedBugList = bugListString
                 .replace(/^\[|\]$/g, '') // Remove outer brackets
                 .split("'], ['")         // Split into individual bugs
-                .map(bug => '🐛: [' + bug.replace(/^\['|'\]$/g, '') // Remove [' at start and '] at end
-                               .replace(/^'|'$/g, '') + "](./bug_reports.js)"); // Remove any remaining single quotes
+                .map((bug, index) => {
+                  const bugContent = bug.replace(/^\['|'\]$/g, '').replace(/^'|'$/g, '');
+                  return `🐛: [${bugContent}](./bug_${index}.js)`;
+                });
             } catch (error) {
               console.warn('Error parsing bug list:', error);
               // If parsing fails, use the original string as a single item

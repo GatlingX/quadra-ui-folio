@@ -14,6 +14,22 @@ const Index = () => {
   const [sourceFiles, setSourceFiles] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
 
+  const handleBugReport = (filepath, displayText) => {
+    setSourceFiles(prevFiles => {
+      const fileIndex = prevFiles.findIndex(file => file.name === filepath);
+      if (fileIndex !== -1) {
+        const updatedFiles = [...prevFiles];
+        updatedFiles[fileIndex] = { 
+          ...updatedFiles[fileIndex],
+          content: `// ${displayText}` 
+        };
+        return updatedFiles;
+      } else {
+        return [...prevFiles, { name: filepath, content: `// ${displayText}: ` }];
+      }
+    });
+  }
+
   const handleNodeClick = (node) => {
     const fileName = `${node.name}.js`;
     setSourceFiles(prevFiles => {
@@ -59,6 +75,7 @@ const Index = () => {
             messages={chatMessages} 
             setMessages={setChatMessages} 
             setSourceFiles={setSourceFiles}
+            setBugReport={handleBugReport}
           />
         </div>
         <div className="h-[calc(50vh-4rem)] overflow-hidden">
