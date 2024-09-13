@@ -102,7 +102,31 @@ const Console = ({ output, setOutput, messages, setMessages }) => {
       // Handling the stream of data from the backend
       for await (const data of stream) {
         if (data.message) {
-          setOutput(prev => `${prev}\n${colorText(data.message, 'cyan')}`);
+          if (data.message.startsWith('[NEW BUG FOUND]')) {
+            const bugListString = data.message.slice(15).trim();
+
+            // Parse the bugListString into a list of strings
+            let parsedBugList;
+            try {
+              // Try to parse as a Python-like list of lists
+              parsedBugList = bugListString
+                .replace(/^\[|\]$/g, '') // Remove outer brackets
+                .split("'], ['")         // Split into individual bugs
+                .map(bug => '🐛: ' + bug.replace(/^\['|'\]$/g, '') // Remove [' at start and '] at end
+                               .replace(/^'|'$/g, '')); // Remove any remaining single quotes
+            } catch (error) {
+              console.warn('Error parsing bug list:', error);
+              // If parsing fails, use the original string as a single item
+              parsedBugList = [bugListString];
+            }
+
+            parsedBugList.forEach(bug => {
+              setMessages(prev => [...prev, 
+                { sender: 'ai', text: bug.trim() }
+              ]);
+            });
+          }
+          // setOutput(prev => `${prev}\n${colorText(data.message, 'cyan')}`);
         } else if (data.bug_list && data.bug_titles && data.total_score !== undefined) {
           setOutput(prev => `${prev}\n${colorText('Analysis complete:', 'green')}`);
           setOutput(prev => `${prev}\n${colorText(`Bug list: ${JSON.stringify(data.bug_titles)}`, 'yellow')}`);
@@ -133,7 +157,7 @@ const Console = ({ output, setOutput, messages, setMessages }) => {
           setOutput(prev => `${prev}\n${colorText(responseMessage, 'white')}`);
           
           // Add the ping response to the chat messages
-          setMessages(prev => [...messages, 
+          setMessages(prev => [...prev, 
             { sender: 'user', text: 'ping' },
             { sender: 'ai', text: 'pong' }
           ]);
