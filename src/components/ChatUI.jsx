@@ -8,7 +8,7 @@ const commands = [
   { name: '/run', description: 'Run code in console' },
 ];
 
-const ChatUI = ({ messages, setMessages }) => {
+const ChatUI = ({ messages, setMessages, setSourceFiles }) => {
   const [input, setInput] = useState('');
   const [showCommands, setShowCommands] = useState(false);
   const [filteredCommands, setFilteredCommands] = useState(commands);
@@ -69,17 +69,48 @@ const ChatUI = ({ messages, setMessages }) => {
     }
   };
 
+  const renderMessage = (msg) => {
+    const match = msg.text.match(/^(.*?): \[(.*?)\]\((.*?)\)$/);
+    if (match) {
+      const [, prefix, displayText, filePath] = match;
+      return {
+        prefix,
+        displayText,
+        filePath
+      };
+    }
+    return { text: msg.text };
+  };
+
+  useEffect(() => {
+    const newSourceFiles = messages
+      .map(msg => renderMessage(msg))
+      .filter(result => result.filePath)
+      .map(result => result.filePath);
+    
+    if (newSourceFiles.length > 0) {
+      setSourceFiles(prev => [...new Set([...prev, ...newSourceFiles])]);
+    }
+  }, [messages, setSourceFiles]);
+
   return (
     <div className="bg-white p-4 rounded-lg shadow-md flex flex-col h-full">
       <h2 className="text-xl font-bold mb-2">Chat</h2>
       <div className="flex-1 overflow-auto mb-4 pr-2">
-        {messages.map((msg, index) => (
-          <div key={index} className={`mb-2 ${msg.sender === 'user' ? 'text-right' : 'text-left'}`}>
-            <span className={`inline-block p-2 rounded-lg ${msg.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>
-              {msg.text}
-            </span>
-          </div>
-        ))}
+        {messages.map((msg, index) => {
+          const renderedMessage = renderMessage(msg);
+          return (
+            <div key={index} className={`mb-2 ${msg.sender === 'user' ? 'text-right' : 'text-left'}`}>
+              <span className={`inline-block p-2 rounded-lg ${msg.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>
+                {renderedMessage.prefix ? (
+                  <>
+                    {renderedMessage.prefix}: <u>{renderedMessage.displayText}</u>
+                  </>
+                ) : renderedMessage.text}
+              </span>
+            </div>
+          );
+        })}
         <div ref={messagesEndRef} />
       </div>
       <div className="flex items-end">
