@@ -70,7 +70,6 @@ const ChatUI = ({ messages, setMessages, setSourceFiles, handleBugReport, setAct
   };
 
   const handleFileClick = (data) => {
-    console.log('handleFileClick', data.bug_id);
     handleBugReport(data);
     setActiveFile(data.bug_id);
   };

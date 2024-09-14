@@ -77,6 +77,9 @@ const Console = ({ output, setOutput, setMessages, handleBugReport }) => {
         case 'clear':
           setOutput('');
           break;
+        case 'count':
+          await countWithLoadingBar();
+          break;
         case 'date':
           setOutput(prev => `${prev}\n${colorText(new Date().toString(), 'white')}`);
           break;
@@ -93,6 +96,31 @@ const Console = ({ output, setOutput, setMessages, handleBugReport }) => {
           setOutput(prev => `${prev}\nCommand not found: ${command}`);
       }
     }
+  };
+
+  // Update the progress bar
+  const updateProgressBar = (current, total, message = '') => {
+    const barLength = 20;
+    const progress = Math.floor((current / total) * barLength);
+    const bar = '█'.repeat(progress) + '░'.repeat(barLength - progress);
+    const progressLine = `\r${colorText(`[${bar}] ${current}/${total}${message ? ' - ' + message : ''}`, 'cyan')}`;
+    setOutput(prev => prev.replace(/\r.*$/, '') + progressLine);
+  };
+
+  // Handle the 'count' command
+  const countWithLoadingBar = async () => {
+    const totalSteps = 8;
+    
+    setOutput(prev => `${prev}\n${colorText('Counting...', 'white')}`);
+    
+    for (let i = 1; i <= totalSteps; i++) {
+      updateProgressBar(i, totalSteps);
+      if (i < totalSteps) {
+        await new Promise(resolve => setTimeout(resolve, 500)); // 500ms delay between counts
+      }
+    }
+    
+    setOutput(prev => `${prev}\n${colorText('Counting complete!', 'green')}`);
   };
 
   const handleHackRepo = async (repoUrl) => {
@@ -119,6 +147,8 @@ const Console = ({ output, setOutput, setMessages, handleBugReport }) => {
             }
           ]);
           handleBugReport(data);
+        } else if (data.progress) {
+          updateProgressBar(data.progress.current, data.progress.total, data.progress.message);
         }
       }
     } catch (error) {
