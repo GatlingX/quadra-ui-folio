@@ -11,7 +11,9 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
   const MIN_SCALE = 0.1;
   const MAX_SCALE = 10;
   const ZOOM_SENSITIVITY = 0.2; // Increased from 0.1
-  const PAN_SENSITIVITY = 10; // Increased from 1.5 to 5
+  const PAN_SENSITIVITY = 1; // Reduced from 10 to 1 for smoother panning
+
+  const [startPanPosition, setStartPanPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const width = svgRef.current.clientWidth;
@@ -57,18 +59,25 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
     return () => {
       svg.removeEventListener('wheel', handleWheel);
     };
-  }, []);
+  }, [skillLibrary]); // Add skillLibrary to the dependency array
 
   const handleMouseDown = (e) => {
     setIsPanning(true);
+    setStartPanPosition({ x: e.clientX, y: e.clientY });
   };
 
   const handleMouseMove = (e) => {
     if (isPanning) {
+      const dx = e.clientX - startPanPosition.x;
+      const dy = e.clientY - startPanPosition.y;
+      
       api.start({
-        x: springs.x.get() + e.movementX * PAN_SENSITIVITY / springs.scale.get(),
-        y: springs.y.get() + e.movementY * PAN_SENSITIVITY / springs.scale.get(),
+        x: springs.x.get() + dx * PAN_SENSITIVITY / springs.scale.get(),
+        y: springs.y.get() + dy * PAN_SENSITIVITY / springs.scale.get(),
+        immediate: true
       });
+
+      setStartPanPosition({ x: e.clientX, y: e.clientY });
     }
   };
 
