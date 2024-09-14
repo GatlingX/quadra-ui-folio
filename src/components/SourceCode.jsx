@@ -55,7 +55,7 @@ const SourceCode = ({ files, setFiles }) => {
               onClick={() => handleTabClick(index)}
             >
               <span className="mr-2">{getFileIcon(file.name)}</span>
-              {file.name}
+              {file.file_name}
               <X
                 size={14}
                 className="ml-2 cursor-pointer"

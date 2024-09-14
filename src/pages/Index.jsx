@@ -14,18 +14,23 @@ const Index = () => {
   const [sourceFiles, setSourceFiles] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
 
-  const handleBugReport = (filepath, displayText) => {
+  const handleBugReport = (data) => {
+    // Handle a new bug report data entry
     setSourceFiles(prevFiles => {
-      const fileIndex = prevFiles.findIndex(file => file.name === filepath);
+      const fileIndex = prevFiles.findIndex(file => file.file_name === `bug_${data.bug_id}.md`);
       if (fileIndex !== -1) {
+        // Create a new array with all the previous files
         const updatedFiles = [...prevFiles];
+        // Update the file at the found index
         updatedFiles[fileIndex] = { 
           ...updatedFiles[fileIndex],
-          content: `// ${displayText}` 
+          content: `${data.bug_description}` 
         };
         return updatedFiles;
       } else {
-        return [...prevFiles, { name: filepath, content: `// ${displayText}: ` }];
+        const file_name = `bug_${data.bug_id}.md`;
+        // If the file doesn't exist, add a new file to the array
+        return [...prevFiles, { file_name: file_name, content: `${data.bug_description}` }];
       }
     });
   }
@@ -68,6 +73,7 @@ const Index = () => {
             setOutput={setConsoleOutput}
             messages={chatMessages}
             setMessages={setChatMessages}
+            handleBugReport={handleBugReport}
           />
         </div>
         <div className="h-[calc(50vh-4rem)] overflow-hidden">

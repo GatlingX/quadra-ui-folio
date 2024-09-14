@@ -4,7 +4,7 @@ import Convert from 'ansi-to-html';
 
 const convert = new Convert();
 
-const Console = ({ output, setOutput, messages, setMessages }) => {
+const Console = ({ output, setOutput, setMessages, handleBugReport }) => {
   const [history, setHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [inputValue, setInputValue] = useState('');
@@ -102,38 +102,18 @@ const Console = ({ output, setOutput, messages, setMessages }) => {
       // Handling the stream of data from the backend
       for await (const data of stream) {
         if (data.message) {
-          if (data.message.startsWith('[NEW BUG FOUND]')) {
-            const bugListString = data.message.slice(15).trim();
-
-            // Parse the bugListString into a list of strings
-            let parsedBugList;
-            try {
-              // Try to parse as a Python-like list of lists
-              parsedBugList = bugListString
-                .replace(/^\[|\]$/g, '') // Remove outer brackets
-                .split("'], ['")         // Split into individual bugs
-                .map((bug, index) => {
-                  const bugContent = bug.replace(/^\['|'\]$/g, '').replace(/^'|'$/g, '');
-                  return `🐛: [${bugContent}](./bug_${index}.js)`;
-                });
-            } catch (error) {
-              console.warn('Error parsing bug list:', error);
-              // If parsing fails, use the original string as a single item
-              parsedBugList = [bugListString];
-            }
-
-            parsedBugList.forEach(bug => {
-              setMessages(prev => [...prev, 
-                { sender: 'ai', text: bug.trim() }
-              ]);
-            });
-          }else{
             setOutput(prev => `${prev}\n${colorText(data.message, 'cyan')}`);
-          }
         } else if (data.bug_list && data.bug_titles && data.total_score !== undefined) {
           setOutput(prev => `${prev}\n${colorText('Analysis complete:', 'green')}`);
           setOutput(prev => `${prev}\n${colorText(`Bug list: ${JSON.stringify(data.bug_titles)}`, 'yellow')}`);
           setOutput(prev => `${prev}\n${colorText(`Total score: ${data.total_score}`, 'yellow')}`);
+        } else if (data.bug_id && data.bug_title && data.bug_description) {
+          console.log('data', data);
+          console.log('bug title', data.bug_title);
+          setMessages(prev => [...prev, 
+            { sender: 'ai', text: `🐛: [${data.bug_title}](./bug_${data.bug_id}.js)` }
+          ]);
+          handleBugReport(data);
         }
       }
     } catch (error) {
