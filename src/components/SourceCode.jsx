@@ -44,6 +44,11 @@ const SourceCode = ({ files, setFiles, activeFile, setActiveFile }) => {
     }
   };
 
+  const handleCloseAllFiles = () => {
+    setFiles([]);
+    setActiveFile(null);
+  };
+
   useEffect(() => {
     const tabContainer = tabContainerRef.current;
     if (tabContainer) {
@@ -89,7 +94,10 @@ const SourceCode = ({ files, setFiles, activeFile, setActiveFile }) => {
           ))}
         </div>
         <div className="flex space-x-2">
-          <div className="w-3 h-3 rounded-full bg-red-500"></div>
+          <div 
+            className="w-3 h-3 rounded-full bg-red-500 cursor-pointer transition-all duration-200 hover:w-4 hover:h-4"
+            onClick={handleCloseAllFiles}
+          ></div>
           <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
           <div className="w-3 h-3 rounded-full bg-green-500"></div>
         </div>

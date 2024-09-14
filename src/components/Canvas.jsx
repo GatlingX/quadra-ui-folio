@@ -135,7 +135,7 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
               >
                 <animated.circle 
                   r={springs.scale.to(s => 5 / s)}
-                  fill={selectedNode && selectedNode.name === node.name ? 'red' : `hsl(${node.level * 30}, 70%, 60%)`} 
+                  fill={selectedNode && selectedNode.name === node.name ? 'blue' : `hsl(${node.level * 30}, 70%, 60%)`} 
                 />
                 <animated.text
                   textAnchor="middle"

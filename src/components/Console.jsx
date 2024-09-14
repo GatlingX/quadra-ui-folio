@@ -205,7 +205,6 @@ const Console = ({ output, setOutput, setMessages, handleBugReport, setSkillLibr
       const response = await pingExampleGraph();
       if (response.ok) {
         const data = await response.json();
-        console.log("data", data);
         setSkillLibrary(data);
         setOutput(prev => `${prev}\n${colorText('Skill graph generated and updated successfully!', 'green')}`);
       } else {
