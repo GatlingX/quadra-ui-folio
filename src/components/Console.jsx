@@ -107,11 +107,16 @@ const Console = ({ output, setOutput, setMessages, handleBugReport }) => {
           setOutput(prev => `${prev}\n${colorText('Analysis complete:', 'green')}`);
           setOutput(prev => `${prev}\n${colorText(`Bug list: ${JSON.stringify(data.bug_titles)}`, 'yellow')}`);
           setOutput(prev => `${prev}\n${colorText(`Total score: ${data.total_score}`, 'yellow')}`);
-        } else if (data.bug_id && data.bug_title && data.bug_description) {
-          console.log('data', data);
-          console.log('bug title', data.bug_title);
+        } else if (data.bug_id >= 0 && data.bug_title && data.bug_description) {
+          console.log('data.bug_id', data.bug_id);
           setMessages(prev => [...prev, 
-            { sender: 'ai', text: `🐛: [${data.bug_title}](./bug_${data.bug_id}.js)` }
+            { 
+              sender: 'ai', 
+              text: `🐛(${data.bug_id}): [${data.bug_title}](bug_${data.bug_id}.md)`,
+              bug_id: data.bug_id,
+              bug_title: data.bug_title,
+              bug_description: data.bug_description
+            }
           ]);
           handleBugReport(data);
         }

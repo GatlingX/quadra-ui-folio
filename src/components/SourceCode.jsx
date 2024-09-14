@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FileIcon, FileCode, FileJson, FileType, X } from 'lucide-react';
 import { FileSol } from './FileSol';
 
-const SourceCode = ({ files, setFiles }) => {
-  const [activeFile, setActiveFile] = useState(0);
+const SourceCode = ({ files, setFiles, activeFile, setActiveFile }) => {
+  
   const tabContainerRef = useRef(null);
+  const activeTabRef = useRef(null);
 
   const getFileIcon = (fileName) => {
     if (!fileName) return null;
@@ -55,6 +56,12 @@ const SourceCode = ({ files, setFiles }) => {
     }
   }, []);
 
+  useEffect(() => {
+    if (activeTabRef.current) {
+      activeTabRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+    }
+  }, [activeFile]);
+
   return (
     <div className="bg-[#1e1e1e] text-white p-4 rounded-lg flex flex-col h-full">
       <div className="flex items-center justify-between mb-2">
@@ -65,6 +72,7 @@ const SourceCode = ({ files, setFiles }) => {
           {files.map((file, index) => (
             <div
               key={index}
+              ref={index === activeFile ? activeTabRef : null}
               className={`px-3 py-1 mr-1 cursor-pointer rounded-t-lg flex items-center ${
                 index === activeFile ? 'bg-[#2d2d2d] text-white' : 'bg-[#252526] text-gray-400'
               }`}

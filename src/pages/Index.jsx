@@ -13,24 +13,31 @@ const Index = () => {
   const [chatMessages, setChatMessages] = useState([]);
   const [sourceFiles, setSourceFiles] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
+  const [activeFile, setActiveFile] = useState(0);
 
   const handleBugReport = (data) => {
     // Handle a new bug report data entry
     setSourceFiles(prevFiles => {
-      const fileIndex = prevFiles.findIndex(file => file.file_name === `bug_${data.bug_id}.md`);
+      const fileIndex = prevFiles.findIndex(file => file.id === data.bug_id);
       if (fileIndex !== -1) {
         // Create a new array with all the previous files
         const updatedFiles = [...prevFiles];
         // Update the file at the found index
-        updatedFiles[fileIndex] = { 
-          ...updatedFiles[fileIndex],
-          content: `${data.bug_description}` 
-        };
+        if (data.bug_description) {
+          updatedFiles[fileIndex] = { 
+            ...updatedFiles[fileIndex],
+            content: `${data.bug_description}` 
+          };
+        }
         return updatedFiles;
       } else {
         const file_name = `bug_${data.bug_id}.md`;
         // If the file doesn't exist, add a new file to the array
-        return [...prevFiles, { file_name: file_name, content: `${data.bug_description}` }];
+        return [...prevFiles, { 
+          file_name: file_name, 
+          content: `${data.bug_description}`,
+          id: data.bug_id
+        }];
       }
     });
   }
@@ -81,11 +88,17 @@ const Index = () => {
             messages={chatMessages} 
             setMessages={setChatMessages} 
             setSourceFiles={setSourceFiles}
-            setBugReport={handleBugReport}
+            handleBugReport={handleBugReport}
+            setActiveFile={setActiveFile}
           />
         </div>
         <div className="h-[calc(50vh-4rem)] overflow-hidden">
-          <SourceCode files={sourceFiles} setFiles={setSourceFiles} />
+          <SourceCode 
+            files={sourceFiles} 
+            setFiles={setSourceFiles} 
+            activeFile={activeFile} 
+            setActiveFile={setActiveFile} 
+          />
         </div>
         <div className="h-[calc(50vh-4rem)] overflow-hidden">
           <SkillHierarchy onNodeClick={handleNodeClick} selectedNode={selectedNode} />

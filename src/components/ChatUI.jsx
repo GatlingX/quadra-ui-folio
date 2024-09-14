@@ -8,7 +8,7 @@ const commands = [
   { name: '/run', description: 'Run code in console' },
 ];
 
-const ChatUI = ({ messages, setMessages, setSourceFiles, setBugReport }) => {
+const ChatUI = ({ messages, setMessages, setSourceFiles, handleBugReport, setActiveFile }) => {
   const [input, setInput] = useState('');
   const [showCommands, setShowCommands] = useState(false);
   const [filteredCommands, setFilteredCommands] = useState(commands);
@@ -69,21 +69,29 @@ const ChatUI = ({ messages, setMessages, setSourceFiles, setBugReport }) => {
     }
   };
 
-  const handleFileClick = (filePath, displayText) => {
-    // You'll need to implement this function to handle file clicks
-    console.log(`File clicked: ${filePath} for ${displayText}`);
-    setBugReport(filePath, displayText);
-    // For example, you might want to open the file in an editor or display its contents
+  const handleFileClick = (data) => {
+    console.log('handleFileClick', data.bug_id);
+    handleBugReport(data);
+    setActiveFile(data.bug_id);
   };
 
   const renderMessage = (msg) => {
     const match = msg.text.match(/^(.*?): \[(.*?)\]\((.*?)\)$/);
+    // Important not to use bug_id as it fails on bug_id = 0
+    const data = msg.bug_title ? {
+      bug_id: msg.bug_id,
+      bug_title: msg.bug_title,
+      bug_description: msg.bug_description
+    } : {};
+
+    // Render the message in md format
     if (match) {
-      const [, prefix, displayText, filePath] = match;
+      const [, prefix, displayText, embed_content] = match;
       return {
         prefix,
         displayText,
-        filePath
+        embed_content,
+        ...data
       };
     }
     return { text: msg.text };
@@ -111,7 +119,7 @@ const ChatUI = ({ messages, setMessages, setSourceFiles, setBugReport }) => {
                     {renderedMessage.prefix}:{' '}
                     <span 
                       className="underline cursor-pointer"
-                      onClick={() => handleFileClick(renderedMessage.filePath, renderedMessage.displayText)}
+                      onClick={() => handleFileClick(renderedMessage)}
                     >
                       {renderedMessage.displayText}
                     </span>
