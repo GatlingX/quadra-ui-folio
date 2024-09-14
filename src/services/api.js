@@ -90,4 +90,14 @@ export async function pingBackend() {
   };
 }
 
+export const pingExampleGraph = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/graph`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return response;
+};
+
 // Add more API functions here as needed

@@ -9,11 +9,20 @@ import ShareDialog from '../components/ShareDialog';
 import InfoDialog from '../components/InfoDialog';
 
 const Index = () => {
+  
+  // Console component state
   const [consoleOutput, setConsoleOutput] = useState('Welcome to Hackerbot Console!\nType "help" for available commands.');
+
+  // ChatUI component state
   const [chatMessages, setChatMessages] = useState([]);
+
+  // SourceCode component state
   const [sourceFiles, setSourceFiles] = useState([]);
-  const [selectedNode, setSelectedNode] = useState(null);
   const [activeFile, setActiveFile] = useState(0);
+
+  // SkillHierarchy (Canvas) component state
+  const [selectedNode, setSelectedNode] = useState(null);
+  const [skillLibrary, setSkillLibrary] = useState([]);
 
   const handleBugReport = (data) => {
     // Handle a new bug report data entry
@@ -81,6 +90,7 @@ const Index = () => {
             messages={chatMessages}
             setMessages={setChatMessages}
             handleBugReport={handleBugReport}
+            setSkillLibrary={setSkillLibrary}
           />
         </div>
         <div className="h-[calc(50vh-4rem)] overflow-hidden">
@@ -101,8 +111,12 @@ const Index = () => {
           />
         </div>
         <div className="h-[calc(50vh-4rem)] overflow-hidden">
-          <SkillHierarchy onNodeClick={handleNodeClick} selectedNode={selectedNode} />
-        </div>
+          <SkillHierarchy 
+            onNodeClick={handleNodeClick} 
+            selectedNode={selectedNode} 
+            skillLibrary={skillLibrary}
+          />
+        </div>Add a command graph that pings the back end with slash graph 
       </div>
     </div>
   );

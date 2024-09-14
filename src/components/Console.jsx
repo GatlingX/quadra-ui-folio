@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { hackRepo, pingBackend } from '../services/api';
+import { hackRepo, pingBackend, pingExampleGraph } from '../services/api';
 import Convert from 'ansi-to-html';
 
 const convert = new Convert();
 
-const Console = ({ output, setOutput, setMessages, handleBugReport }) => {
+const Console = ({ output, setOutput, setMessages, handleBugReport, setSkillLibrary }) => {
   const [history, setHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [inputValue, setInputValue] = useState('');
@@ -92,6 +92,9 @@ const Console = ({ output, setOutput, setMessages, handleBugReport }) => {
         case 'ping':
           await handlePingBackend();
           break;
+        case 'graph':
+          await handleGraphSkills();
+          break;
         default:
           setOutput(prev => `${prev}\nCommand not found: ${command}`);
       }
@@ -130,12 +133,10 @@ const Console = ({ output, setOutput, setMessages, handleBugReport }) => {
       // Handling the stream of data from the backend
       for await (const data of stream) {
         if (data.message) {
+          // Handle the message from the backend to print to the console
             setOutput(prev => `${prev}\n${colorText(data.message, 'cyan')}`);
-        } else if (data.bug_list && data.bug_titles && data.total_score !== undefined) {
-          setOutput(prev => `${prev}\n${colorText('Analysis complete:', 'green')}`);
-          setOutput(prev => `${prev}\n${colorText(`Bug list: ${JSON.stringify(data.bug_titles)}`, 'yellow')}`);
-          setOutput(prev => `${prev}\n${colorText(`Total score: ${data.total_score}`, 'yellow')}`);
         } else if (data.bug_id >= 0 && data.bug_title && data.bug_description) {
+          // Handle the sending of a new bug report
           console.log('data.bug_id', data.bug_id);
           setMessages(prev => [...prev, 
             { 
@@ -148,7 +149,13 @@ const Console = ({ output, setOutput, setMessages, handleBugReport }) => {
           ]);
           handleBugReport(data);
         } else if (data.progress) {
+          // Handle the progress bar update
           updateProgressBar(data.progress.current, data.progress.total, data.progress.message);
+        } else if (data.skill_library) {
+          // Handle the skill library update
+          console.log("data.skill_library", data.skill_library);
+          const skill_lib_data = data.skill_library
+          setSkillLibrary(skill_lib_data);
         }
       }
     } catch (error) {
@@ -169,8 +176,6 @@ const Console = ({ output, setOutput, setMessages, handleBugReport }) => {
       if (ok) {
         try {
           const data = JSON.parse(responseData);
-          setOutput(prev => `${prev}\n${colorText(`Backend responded: ${data.message}`, 'white')}`);
-          setOutput(prev => `${prev}\n${colorText(`Latency: ${latency}ms`, 'white')}`);
           const responseMessage = `Backend responded: ${data.message}\nLatency: ${latency}ms`;
           setOutput(prev => `${prev}\n${colorText(responseMessage, 'white')}`);
           
@@ -186,6 +191,25 @@ const Console = ({ output, setOutput, setMessages, handleBugReport }) => {
       } else {
         setOutput(prev => `${prev}\n${colorText(`Error: Backend responded with status ${status}`, 'red')}`);
         setOutput(prev => `${prev}\n${colorText(`Response: ${responseData}`, 'red')}`);
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+      setOutput(prev => `${prev}\n${colorText(`Error: ${error.message}`, 'red')}`);
+      setOutput(prev => `${prev}\n${colorText('Check browser console for more details.', 'yellow')}`);
+    }
+  };
+
+  const handleGraphSkills = async () => {
+    setOutput(prev => `${prev}\n${colorText('Generating skill graph...', 'white')}`);
+    try {
+      const response = await pingExampleGraph();
+      if (response.ok) {
+        const data = await response.json();
+        console.log("data", data);
+        setSkillLibrary(data);
+        setOutput(prev => `${prev}\n${colorText('Skill graph generated and updated successfully!', 'green')}`);
+      } else {
+        setOutput(prev => `${prev}\n${colorText(`Error: Backend responded with status ${response.status}`, 'red')}`);
       }
     } catch (error) {
       console.error('Fetch error:', error);
