@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FileIcon, FileCode, FileJson, FileType, X } from 'lucide-react';
 import { FileSol } from './FileSol';
 
 const SourceCode = ({ files, setFiles }) => {
   const [activeFile, setActiveFile] = useState(0);
+  const tabContainerRef = useRef(null);
 
   const getFileIcon = (fileName) => {
     if (!fileName) return null;
@@ -42,10 +43,25 @@ const SourceCode = ({ files, setFiles }) => {
     }
   };
 
+  useEffect(() => {
+    const tabContainer = tabContainerRef.current;
+    if (tabContainer) {
+      const handleWheel = (e) => {
+        e.preventDefault();
+        tabContainer.scrollLeft += e.deltaY;
+      };
+      tabContainer.addEventListener('wheel', handleWheel, { passive: false });
+      return () => tabContainer.removeEventListener('wheel', handleWheel);
+    }
+  }, []);
+
   return (
     <div className="bg-[#1e1e1e] text-white p-4 rounded-lg flex flex-col h-full">
       <div className="flex items-center justify-between mb-2">
-        <div className="flex overflow-x-auto">
+        <div 
+          ref={tabContainerRef}
+          className="flex overflow-x-auto scrollbar-hide"
+        >
           {files.map((file, index) => (
             <div
               key={index}
