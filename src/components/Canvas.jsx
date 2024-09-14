@@ -1,28 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSpring, animated } from 'react-spring';
 
 const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
   const [nodes, setNodes] = useState([]);
   const [links, setLinks] = useState([]);
   const [isPanning, setIsPanning] = useState(false);
   const svgRef = useRef(null);
-  const [viewBox, setViewBox] = useState({ x: 0, y: 0, width: 3000, height: 1500 }); // Increased initial width and height
+  const [springs, api] = useSpring(() => ({ scale: 1, x: 0, y: 0, config: { mass: 1, tension: 170, friction: 26 } }));
 
-  const MIN_ZOOM = 0.5;
-  const MAX_ZOOM = 5;
-  const ZOOM_SPEED = 0.1;
+  const MIN_SCALE = 0.1;
+  const MAX_SCALE = 10;
+  const ZOOM_SENSITIVITY = 0.2; // Increased from 0.1
+  const PAN_SENSITIVITY = 10; // Increased from 1.5 to 5
 
   useEffect(() => {
-    if (!svgRef.current) return;
-
-    const width = svgRef.current.clientWidth * 3; // Triple the width
-    const height = svgRef.current.clientHeight * 1.5; // Increase height by 50%
+    const width = svgRef.current.clientWidth;
+    const height = svgRef.current.clientHeight;
 
     const buildDendrogram = (skills, x, y, level) => {
-      if (!Array.isArray(skills)) {
-        console.error("Skills is not an array:", skills);
-        return [[], []];
-      }
-
       const newNodes = [];
       const newLinks = [];
 
@@ -34,7 +29,7 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
         newNodes.push({ id: skill.name, x: skillX, y: skillY, name: skill.name, level });
 
         if (skill.children) {
-          const [childNodes, childLinks] = buildDendrogram(skill.children, skillX, skillY + 200, level + 1); // Increased vertical spacing
+          const [childNodes, childLinks] = buildDendrogram(skill.children, skillX, skillY + 100, level + 1);
           newNodes.push(...childNodes);
           newLinks.push(...childLinks);
 
@@ -50,49 +45,19 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
       return [newNodes, newLinks];
     };
 
-    if (Array.isArray(skillLibrary)) {
-      const [newNodes, newLinks] = buildDendrogram(skillLibrary, 0, 50, 0);
-      setNodes(newNodes);
-      setLinks(newLinks);
-    } else {
-      console.error("skillLibrary is not an array:", skillLibrary);
-      setNodes([]);
-      setLinks([]);
-    }
-  }, [skillLibrary]);
+    const [newNodes, newLinks] = buildDendrogram(skillLibrary, 0, 50, 0);
+    setNodes(newNodes);
+    setLinks(newLinks);
 
-  useEffect(() => {
+    // Add non-passive wheel event listener
     const svg = svgRef.current;
-    if (svg) {
-      svg.addEventListener('wheel', handleWheel, { passive: false });
-      return () => {
-        svg.removeEventListener('wheel', handleWheel);
-      };
-    }
+    svg.addEventListener('wheel', handleWheel, { passive: false });
+
+    // Cleanup function
+    return () => {
+      svg.removeEventListener('wheel', handleWheel);
+    };
   }, []);
-
-  const handleWheel = (e) => {
-    e.preventDefault();
-    const { deltaY } = e;
-    const rect = svgRef.current.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    const zoomFactor = deltaY > 0 ? 1 + ZOOM_SPEED : 1 - ZOOM_SPEED;
-
-    const newWidth = viewBox.width * zoomFactor;
-    const newHeight = viewBox.height * zoomFactor;
-
-    if (newWidth / 2000 >= MIN_ZOOM && newWidth / 2000 <= MAX_ZOOM) {
-      const mouseXRatio = mouseX / rect.width;
-      const mouseYRatio = mouseY / rect.height;
-
-      const newX = viewBox.x + (viewBox.width - newWidth) * mouseXRatio;
-      const newY = viewBox.y + (viewBox.height - newHeight) * mouseYRatio;
-
-      setViewBox({ x: newX, y: newY, width: newWidth, height: newHeight });
-    }
-  };
 
   const handleMouseDown = (e) => {
     setIsPanning(true);
@@ -100,13 +65,10 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
 
   const handleMouseMove = (e) => {
     if (isPanning) {
-      const dx = e.movementX * (viewBox.width / svgRef.current.clientWidth);
-      const dy = e.movementY * (viewBox.height / svgRef.current.clientHeight);
-      setViewBox(prev => ({
-        ...prev,
-        x: prev.x - dx,
-        y: prev.y - dy
-      }));
+      api.start({
+        x: springs.x.get() + e.movementX * PAN_SENSITIVITY / springs.scale.get(),
+        y: springs.y.get() + e.movementY * PAN_SENSITIVITY / springs.scale.get(),
+      });
     }
   };
 
@@ -114,16 +76,19 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
     setIsPanning(false);
   };
 
-  const handlePan = (e) => {
-    if (isPanning) {
-      const dx = e.movementX * (viewBox.width / svgRef.current.clientWidth);
-      const dy = e.movementY * (viewBox.height / svgRef.current.clientHeight);
-      setViewBox(prev => ({
-        ...prev,
-        x: prev.x - dx,
-        y: prev.y - dy
-      }));
-    }
+  const handleWheel = (e) => {
+    e.preventDefault();
+    const zoomFactor = Math.exp(-e.deltaY * ZOOM_SENSITIVITY / 100);
+    const newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, springs.scale.get() * zoomFactor));
+
+    const rect = svgRef.current.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    const newX = mouseX - (mouseX - springs.x.get()) * (newScale / springs.scale.get());
+    const newY = mouseY - (mouseY - springs.y.get()) * (newScale / springs.scale.get());
+
+    api.start({ scale: newScale, x: newX, y: newY, immediate: true }); // Added immediate: true
   };
 
   return (
@@ -134,43 +99,47 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
           ref={svgRef}
           width="100%"
           height="100%"
-          viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
+          style={{ userSelect: 'none' }}  // Add this line
         >
-          {links.map((link, index) => (
-            <path
-              key={index}
-              d={`M${link.source.x},${link.source.y} C${link.source.x},${(link.source.y + link.target.y) / 2} ${link.target.x},${(link.source.y + link.target.y) / 2} ${link.target.x},${link.target.y}`}
-              fill="none"
-              stroke="#999"
-              strokeWidth={2}
-            />
-          ))}
-          {nodes.map((node) => (
-            <g
-              key={node.id}
-              transform={`translate(${node.x},${node.y})`}
-              onClick={() => onNodeClick({ name: node.name, content: node.content })}
-              style={{ cursor: 'pointer' }}
-            >
-              <circle 
-                r={15} // Increased circle size
-                fill={selectedNode && selectedNode.name === node.name ? 'red' : `hsl(${node.level * 30}, 70%, 60%)`} 
+          <animated.g style={{
+            transform: springs.scale.to(s => `translate(${springs.x.get()}px, ${springs.y.get()}px) scale(${s})`)
+          }}>
+            {links.map((link, index) => (
+              <path
+                key={index}
+                d={`M${link.source.x},${link.source.y} C${link.source.x},${(link.source.y + link.target.y) / 2} ${link.target.x},${(link.source.y + link.target.y) / 2} ${link.target.x},${link.target.y}`}
+                fill="none"
+                stroke="#999"
+                strokeWidth={springs.scale.to(s => 1 / s)}
               />
-              <text
-                textAnchor="middle"
-                dy=".3em"
-                fontSize={16} // Increased font size
-                fill="black"
-                transform={`translate(0, 25)`} // Adjusted text position
+            ))}
+            {nodes.map((node) => (
+              <g
+                key={node.id}
+                transform={`translate(${node.x},${node.y})`}
+                onClick={() => onNodeClick({ name: node.name, content: node.content })}
+                style={{ cursor: 'pointer' }}
               >
-                {node.name}
-              </text>
-            </g>
-          ))}
+                <animated.circle 
+                  r={springs.scale.to(s => 5 / s)}
+                  fill={selectedNode && selectedNode.name === node.name ? 'red' : `hsl(${node.level * 30}, 70%, 60%)`} 
+                />
+                <animated.text
+                  textAnchor="middle"
+                  dy=".3em"
+                  fontSize={springs.scale.to(s => 12 / s)}
+                  fill="black"
+                  transform={springs.scale.to(s => `translate(0, ${15 / s})`)}
+                >
+                  {node.name}
+                </animated.text>
+              </g>
+            ))}
+          </animated.g>
         </svg>
       </div>
     </div>

@@ -116,7 +116,7 @@ const Index = () => {
             selectedNode={selectedNode} 
             skillLibrary={skillLibrary}
           />
-        </div>Add a command graph that pings the back end with slash graph 
+        </div> 
       </div>
     </div>
   );
