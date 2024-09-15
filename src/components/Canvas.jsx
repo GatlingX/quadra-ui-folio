@@ -55,7 +55,7 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
       const newNodes = [];
       const newLinks = [];
 
-      const skillSpacing = Math.max(100, height / (skills.length + 1));
+      const skillSpacing = Math.max(50, height / (skills.length + 1));
       skills.forEach((skill, index) => {
         const skillX = x;
         const skillY = y + (index + 1) * skillSpacing;
@@ -80,8 +80,41 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
     };
 
     const [newNodes, newLinks] = buildDendrogram(skillLibrary, 50, 0, 0);
-    setNodes(newNodes);
-    setLinks(newLinks);
+
+    // Calculate the bounding box of all nodes
+    const minX = Math.min(...newNodes.map(node => node.x));
+    const maxX = Math.max(...newNodes.map(node => node.x));
+    const minY = Math.min(...newNodes.map(node => node.y));
+    const maxY = Math.max(...newNodes.map(node => node.y));
+
+    // Calculate the scale factor to fit all nodes within the SVG
+    const scaleX = width / (maxX - minX + 100); // Add padding
+    const scaleY = height / (maxY - minY + 100); // Add padding
+    const scale = Math.min(scaleX, scaleY);
+
+    // Apply the scale to all nodes and links
+    const scaledNodes = newNodes.map(node => ({
+      ...node,
+      x: (node.x - minX) * scale + 50,
+      y: (node.y - minY) * scale + 50
+    }));
+
+    const scaledLinks = newLinks.map(link => ({
+      source: {
+        x: (link.source.x - minX) * scale + 50,
+        y: (link.source.y - minY) * scale + 50
+      },
+      target: {
+        x: (link.target.x - minX) * scale + 50,
+        y: (link.target.y - minY) * scale + 50
+      }
+    }));
+
+    setNodes(scaledNodes);
+    setLinks(scaledLinks);
+
+    // Reset the view to fit all nodes
+    api.start({ scale: 1, x: 0, y: 0, immediate: true });
 
     const svg = svgRef.current;
     svg.addEventListener('wheel', handleWheel, { passive: false });
