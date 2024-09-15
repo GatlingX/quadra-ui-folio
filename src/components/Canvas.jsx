@@ -24,15 +24,15 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
       const newNodes = [];
       const newLinks = [];
 
-      const skillSpacing = width / (skills.length + 1);
+      const skillSpacing = Math.max(100, height / (skills.length + 1)); // Increased minimum spacing
       skills.forEach((skill, index) => {
-        const skillX = (index + 1) * skillSpacing;
-        const skillY = y;
+        const skillX = x;
+        const skillY = y + (index + 1) * skillSpacing;
 
         newNodes.push({ id: skill.id, x: skillX, y: skillY, name: skill.name, level });
 
         if (skill.children) {
-          const [childNodes, childLinks] = buildDendrogram(skill.children, skillX, skillY + 100, level + 1);
+          const [childNodes, childLinks] = buildDendrogram(skill.children, skillX + 200, y, level + 1); // Increased horizontal spacing
           newNodes.push(...childNodes);
           newLinks.push(...childLinks);
 
@@ -48,7 +48,7 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
       return [newNodes, newLinks];
     };
 
-    const [newNodes, newLinks] = buildDendrogram(skillLibrary, 0, 50, 0);
+    const [newNodes, newLinks] = buildDendrogram(skillLibrary, 50, 0, 0);
     setNodes(newNodes);
     setLinks(newLinks);
 
