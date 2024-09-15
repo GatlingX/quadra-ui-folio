@@ -71,6 +71,7 @@ const Console = ({ output, setOutput, setMessages, handleBugReport, skillLibrary
     if (command.toLowerCase().startsWith('hack ')) {
       const repoUrl = command.slice(5).trim();
       setOutput(prev => `${prev}\n${colorText(`Attempting to hack: ${repoUrl}`, 'white')}`);
+      setSkillLibrary([]);
       await handleHackRepo(repoUrl);
     } else {
       switch (command.toLowerCase()) {

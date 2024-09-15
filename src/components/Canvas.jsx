@@ -1,6 +1,33 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSpring, animated } from 'react-spring';
 
+// Improved custom hook for dynamic text sizing
+const useDynamicTextSize = (text, maxWidth) => {
+  const [fontSize, setFontSize] = useState(14);
+  const spanRef = useRef(null);
+
+  useEffect(() => {
+    if (spanRef.current && text) {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      let size = 14;
+
+      do {
+        context.font = `${size}px sans-serif`;
+        const metrics = context.measureText(text);
+        if (metrics.width <= maxWidth || size <= 8) {
+          break;
+        }
+        size--;
+      } while (size > 8);
+
+      setFontSize(size);
+    }
+  }, [text, maxWidth]);
+
+  return { fontSize, spanRef };
+};
+
 const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
   const [nodes, setNodes] = useState([]);
   const [links, setLinks] = useState([]);
@@ -10,11 +37,15 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
 
   const MIN_SCALE = 0.1;
   const MAX_SCALE = 10;
-  const ZOOM_SENSITIVITY = 0.2; // Increased from 0.1
-  const PAN_SENSITIVITY = 1; // Reduced from 10 to 1 for smoother panning
+  const ZOOM_SENSITIVITY = 0.2;
+  const PAN_SENSITIVITY = 1;
 
   const [startPanPosition, setStartPanPosition] = useState({ x: 0, y: 0 });
-  const [hoveredNode, setHoveredNode] = useState(null);
+  const [hoveredScaleName, setHoveredScaleName] = useState('');
+  const [pinnedScaleName, setPinnedScaleName] = useState('');
+  const [scaleFontSize, setScaleFontSize] = useState(14);
+  const scaleNameRef = useRef(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
     const width = svgRef.current.clientWidth;
@@ -24,7 +55,7 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
       const newNodes = [];
       const newLinks = [];
 
-      const skillSpacing = Math.max(100, height / (skills.length + 1)); // Increased minimum spacing
+      const skillSpacing = Math.max(100, height / (skills.length + 1));
       skills.forEach((skill, index) => {
         const skillX = x;
         const skillY = y + (index + 1) * skillSpacing;
@@ -32,7 +63,7 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
         newNodes.push({ id: skill.id, x: skillX, y: skillY, name: skill.name, level });
 
         if (skill.children) {
-          const [childNodes, childLinks] = buildDendrogram(skill.children, skillX + 200, y, level + 1); // Increased horizontal spacing
+          const [childNodes, childLinks] = buildDendrogram(skill.children, skillX + 200, y, level + 1);
           newNodes.push(...childNodes);
           newLinks.push(...childLinks);
 
@@ -52,15 +83,42 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
     setNodes(newNodes);
     setLinks(newLinks);
 
-    // Add non-passive wheel event listener
     const svg = svgRef.current;
     svg.addEventListener('wheel', handleWheel, { passive: false });
 
-    // Cleanup function
     return () => {
       svg.removeEventListener('wheel', handleWheel);
     };
-  }, [skillLibrary]); // Add skillLibrary to the dependency array
+  }, [skillLibrary]);
+
+  useEffect(() => {
+    if (scaleNameRef.current && containerRef.current && (hoveredScaleName || pinnedScaleName)) {
+      const containerWidth = containerRef.current.offsetWidth;
+      const titleWidth = containerRef.current.querySelector('span:first-child').offsetWidth;
+      const availableWidth = containerWidth - titleWidth - 16;
+
+      const displayedName = hoveredScaleName || pinnedScaleName;
+      let fontSize = 14;
+      scaleNameRef.current.style.fontSize = `${fontSize}px`;
+
+      if (scaleNameRef.current.scrollWidth > availableWidth) {
+        while (scaleNameRef.current.scrollWidth > availableWidth && fontSize > 8) {
+          fontSize--;
+          scaleNameRef.current.style.fontSize = `${fontSize}px`;
+        }
+      } else {
+        while (fontSize < 14 && scaleNameRef.current.scrollWidth <= availableWidth) {
+          fontSize++;
+          scaleNameRef.current.style.fontSize = `${fontSize}px`;
+        }
+        if (scaleNameRef.current.scrollWidth > availableWidth) {
+          fontSize--;
+        }
+      }
+
+      setScaleFontSize(fontSize);
+    }
+  }, [hoveredScaleName, pinnedScaleName]);
 
   const handleMouseDown = (e) => {
     setIsPanning(true);
@@ -98,12 +156,31 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
     const newX = mouseX - (mouseX - springs.x.get()) * (newScale / springs.scale.get());
     const newY = mouseY - (mouseY - springs.y.get()) * (newScale / springs.scale.get());
 
-    api.start({ scale: newScale, x: newX, y: newY, immediate: true }); // Added immediate: true
+    api.start({ scale: newScale, x: newX, y: newY, immediate: true });
+  };
+
+  const handleNodeClick = (node) => {
+    setPinnedScaleName(node.name);
+    onNodeClick(node);
   };
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md h-full flex flex-col">
-      <h2 className="text-xl font-bold mb-4">Skill Hierarchy</h2>
+      <h2 ref={containerRef} className="text-xl font-bold mb-4 flex items-center">
+        <span className="whitespace-nowrap mr-2 flex-shrink-0">Skill Hierarchy</span>
+        {(hoveredScaleName || pinnedScaleName) && (
+          <span 
+            ref={scaleNameRef}
+            className="text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis flex-grow min-w-0"
+            style={{ 
+              fontSize: `${scaleFontSize}px`,
+              lineHeight: '1.2',
+            }}
+          >
+            {hoveredScaleName || pinnedScaleName}
+          </span>
+        )}
+      </h2>
       <div className="flex-1 overflow-hidden">
         <svg
           ref={svgRef}
@@ -113,7 +190,7 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
-          style={{ userSelect: 'none' }}  // Add this line
+          style={{ userSelect: 'none' }}
         >
           <animated.g style={{
             transform: springs.scale.to(s => `translate(${springs.x.get()}px, ${springs.y.get()}px) scale(${s})`)
@@ -131,9 +208,9 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
               <g
                 key={node.id}
                 transform={`translate(${node.x},${node.y})`}
-                onClick={() => onNodeClick({ id: node.id, name: node.name, content: node.content })}
-                onMouseEnter={() => setHoveredNode(node)}
-                onMouseLeave={() => setHoveredNode(null)}
+                onClick={() => handleNodeClick({ id: node.id, name: node.name, content: node.content })}
+                onMouseEnter={() => setHoveredScaleName(node.name)}
+                onMouseLeave={() => setHoveredScaleName('')}
                 style={{ cursor: 'pointer' }}
               >
                 <animated.circle 
@@ -149,17 +226,6 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
                 >
                   {node.id}
                 </animated.text>
-                {hoveredNode === node && (
-                  <animated.text
-                    textAnchor="middle"
-                    dy=".3em"
-                    fontSize={springs.scale.to(s => 14 / s)}
-                    fill="black"
-                    transform={springs.scale.to(s => `translate(0, ${-20 / s})`)}
-                  >
-                    {node.name}
-                  </animated.text>
-                )}
               </g>
             ))}
           </animated.g>
