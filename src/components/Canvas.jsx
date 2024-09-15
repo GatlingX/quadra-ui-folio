@@ -55,10 +55,13 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
       const newNodes = [];
       const newLinks = [];
 
-      const skillSpacing = Math.max(50, height / (skills.length + 1));
+      // Reduce the spacing between nodes
+      const skillSpacing = Math.max(30, height / (skills.length + 2));
+      
       skills.forEach((skill, index) => {
         const skillX = x;
-        const skillY = y + (index + 1) * skillSpacing;
+        // Place the first node much higher and reduce spacing between subsequent nodes
+        const skillY = y + (index * skillSpacing);
 
         newNodes.push({ id: skill.id, x: skillX, y: skillY, name: skill.name, level });
 
