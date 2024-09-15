@@ -90,6 +90,7 @@ const Index = () => {
             messages={chatMessages}
             setMessages={setChatMessages}
             handleBugReport={handleBugReport}
+            skillLibrary={skillLibrary}
             setSkillLibrary={setSkillLibrary}
           />
         </div>

@@ -4,7 +4,7 @@ import Convert from 'ansi-to-html';
 
 const convert = new Convert();
 
-const Console = ({ output, setOutput, setMessages, handleBugReport, setSkillLibrary }) => {
+const Console = ({ output, setOutput, setMessages, handleBugReport, skillLibrary, setSkillLibrary }) => {
   const [history, setHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [inputValue, setInputValue] = useState('');
@@ -148,6 +148,17 @@ const Console = ({ output, setOutput, setMessages, handleBugReport, setSkillLibr
             }
           ]);
           handleBugReport(data);
+
+          // Add the bug title to the skill library
+          const node_data = {
+            name: data.bug_title,
+            id: data.bug_id, // FIXME: This is a temporary fix to get the node_id
+            children: []
+          };
+          setSkillLibrary(prevLibrary => {
+            const updatedLibrary = [...prevLibrary, node_data];
+            return updatedLibrary;
+          });
         } else if (data.progress) {
           // Handle the progress bar update
           updateProgressBar(data.progress.current, data.progress.total, data.progress.message);
