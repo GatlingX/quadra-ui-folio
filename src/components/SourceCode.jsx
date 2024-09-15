@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FileIcon, FileCode, FileJson, FileType, X } from 'lucide-react';
+import { FileIcon, FileCode, FileType, X, Code, Eye } from 'lucide-react';
 import { FileSol } from './FileSol';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const SourceCode = ({ files, setFiles, activeFile, setActiveFile }) => {
   
   const tabContainerRef = useRef(null);
   const activeTabRef = useRef(null);
+  const [isSourceView, setIsSourceView] = useState(true);
 
   const getFileIcon = (fileName) => {
     if (!fileName) return null;
@@ -47,6 +50,56 @@ const SourceCode = ({ files, setFiles, activeFile, setActiveFile }) => {
   const handleCloseAllFiles = () => {
     setFiles([]);
     setActiveFile(null);
+  };
+
+  const toggleView = () => {
+    setIsSourceView(!isSourceView);
+  };
+
+  const renderContent = () => {
+    if (files.length > 0 && files[activeFile]) {
+      const content = files[activeFile].content || '';
+      
+      if (isSourceView) {
+        return (
+          <textarea
+            value={content}
+            onChange={handleChange}
+            className="w-full h-full bg-[#1e1e1e] text-white p-2 font-mono text-sm resize-none focus:outline-none"
+            placeholder="Enter your code here..."
+            spellCheck="false"
+          />
+        );
+      } else {
+        return (
+          <div className="w-full h-full overflow-auto bg-white text-black p-4">
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm]}
+              components={{
+                h1: ({node, ...props}) => <h1 className="text-2xl font-bold my-4" {...props} />,
+                h2: ({node, ...props}) => <h2 className="text-xl font-bold my-3" {...props} />,
+                h3: ({node, ...props}) => <h3 className="text-lg font-bold my-2" {...props} />,
+                p: ({node, ...props}) => <p className="my-2" {...props} />,
+                ul: ({node, ...props}) => <ul className="list-disc list-inside my-2" {...props} />,
+                ol: ({node, ...props}) => <ol className="list-decimal list-inside my-2" {...props} />,
+                code: ({node, inline, ...props}) => 
+                  inline 
+                    ? <code className="bg-gray-100 rounded px-1" {...props} />
+                    : <pre className="bg-gray-100 rounded p-2 my-2 overflow-auto"><code {...props} /></pre>
+              }}
+            >
+              {content}
+            </ReactMarkdown>
+          </div>
+        );
+      }
+    } else {
+      return (
+        <div className="w-full h-full flex items-center justify-center text-gray-500">
+          No file selected.
+        </div>
+      );
+    }
   };
 
   useEffect(() => {
@@ -95,27 +148,21 @@ const SourceCode = ({ files, setFiles, activeFile, setActiveFile }) => {
         </div>
         <div className="flex space-x-2">
           <div 
-            className="w-3 h-3 rounded-full bg-red-500 cursor-pointer transition-all duration-200 hover:w-4 hover:h-4"
+            className="w-6 h-6 flex items-center justify-center cursor-pointer text-sky-400 hover:text-sky-300 transition-colors duration-200"
             onClick={handleCloseAllFiles}
-          ></div>
-          <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-          <div className="w-3 h-3 rounded-full bg-green-500"></div>
+          >
+            <X size={16} />
+          </div>
+          <div 
+            className="w-6 h-6 flex items-center justify-center cursor-pointer text-sky-400 hover:text-sky-300 transition-colors duration-200"
+            onClick={toggleView}
+          >
+            {isSourceView ? <Eye size={16} /> : <Code size={16} />}
+          </div>
         </div>
       </div>
       <div className="flex-1 overflow-auto">
-        {files.length > 0 && files[activeFile] ? (
-          <textarea
-            value={files[activeFile].content || ''}
-            onChange={handleChange}
-            className="w-full h-full bg-[#1e1e1e] text-white p-2 font-mono text-sm resize-none focus:outline-none"
-            placeholder="Enter your code here..."
-            spellCheck="false"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-500">
-            No file selected.
-          </div>
-        )}
+        {renderContent()}
       </div>
     </div>
   );

@@ -69,6 +69,7 @@ const Index = () => {
       }
     });
     setSelectedNode(node);
+    setActiveFile(node.id);
   };
 
   return (
