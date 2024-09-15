@@ -14,6 +14,7 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
   const PAN_SENSITIVITY = 1; // Reduced from 10 to 1 for smoother panning
 
   const [startPanPosition, setStartPanPosition] = useState({ x: 0, y: 0 });
+  const [hoveredNode, setHoveredNode] = useState(null);
 
   useEffect(() => {
     const width = svgRef.current.clientWidth;
@@ -28,7 +29,7 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
         const skillX = (index + 1) * skillSpacing;
         const skillY = y;
 
-        newNodes.push({ id: skill.name, x: skillX, y: skillY, name: skill.name, level });
+        newNodes.push({ id: skill.id, x: skillX, y: skillY, name: skill.name, level });
 
         if (skill.children) {
           const [childNodes, childLinks] = buildDendrogram(skill.children, skillX, skillY + 100, level + 1);
@@ -36,7 +37,7 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
           newLinks.push(...childLinks);
 
           skill.children.forEach(child => {
-            const childNode = childNodes.find(node => node.name === child.name);
+            const childNode = childNodes.find(node => node.id === child.id);
             if (childNode) {
               newLinks.push({ source: { x: skillX, y: skillY }, target: { x: childNode.x, y: childNode.y } });
             }
@@ -130,12 +131,14 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
               <g
                 key={node.id}
                 transform={`translate(${node.x},${node.y})`}
-                onClick={() => onNodeClick({ name: node.name, content: node.content })}
+                onClick={() => onNodeClick({ id: node.id, name: node.name, content: node.content })}
+                onMouseEnter={() => setHoveredNode(node)}
+                onMouseLeave={() => setHoveredNode(null)}
                 style={{ cursor: 'pointer' }}
               >
                 <animated.circle 
                   r={springs.scale.to(s => 5 / s)}
-                  fill={selectedNode && selectedNode.name === node.name ? 'blue' : `hsl(${node.level * 30}, 70%, 60%)`} 
+                  fill={selectedNode && selectedNode.id === node.id ? 'blue' : `hsl(${node.level * 30}, 70%, 60%)`} 
                 />
                 <animated.text
                   textAnchor="middle"
@@ -144,8 +147,19 @@ const SkillHierarchy = ({ onNodeClick, selectedNode, skillLibrary }) => {
                   fill="black"
                   transform={springs.scale.to(s => `translate(0, ${15 / s})`)}
                 >
-                  {node.name}
+                  {node.id}
                 </animated.text>
+                {hoveredNode === node && (
+                  <animated.text
+                    textAnchor="middle"
+                    dy=".3em"
+                    fontSize={springs.scale.to(s => 14 / s)}
+                    fill="black"
+                    transform={springs.scale.to(s => `translate(0, ${-20 / s})`)}
+                  >
+                    {node.name}
+                  </animated.text>
+                )}
               </g>
             ))}
           </animated.g>
