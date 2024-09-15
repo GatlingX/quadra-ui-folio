@@ -52,17 +52,20 @@ const Index = () => {
   }
 
   const handleNodeClick = (node) => {
-    const fileName = `${node.name}.js`;
     setSourceFiles(prevFiles => {
-      const fileIndex = prevFiles.findIndex(file => file.name === fileName);
+      const fileIndex = prevFiles.findIndex(file => file.id === node.id);
       if (fileIndex !== -1) {
-        // Update existing file
+        // If the file exists, update it
         const updatedFiles = [...prevFiles];
-        updatedFiles[fileIndex] = { ...updatedFiles[fileIndex], content: node.content };
+        // No need to update the file content, as it's already set
         return updatedFiles;
       } else {
         // Add new file
-        return [...prevFiles, { name: fileName, content: node.content }];
+        return [...prevFiles, {
+          id: node.id,
+          file_name: `node_${node.id}.md`,
+          content: node.content || `Content for node ${node.id}`
+        }];
       }
     });
     setSelectedNode(node);
