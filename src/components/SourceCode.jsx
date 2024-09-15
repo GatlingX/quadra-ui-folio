@@ -72,20 +72,21 @@ const SourceCode = ({ files, setFiles, activeFile, setActiveFile }) => {
         );
       } else {
         return (
-          <div className="w-full h-full overflow-auto bg-white text-black p-4">
+          <div className="w-full h-full overflow-auto bg-[#1e1e1e] text-white p-4">
             <ReactMarkdown 
               remarkPlugins={[remarkGfm]}
               components={{
-                h1: ({node, ...props}) => <h1 className="text-2xl font-bold my-4" {...props} />,
-                h2: ({node, ...props}) => <h2 className="text-xl font-bold my-3" {...props} />,
-                h3: ({node, ...props}) => <h3 className="text-lg font-bold my-2" {...props} />,
-                p: ({node, ...props}) => <p className="my-2" {...props} />,
-                ul: ({node, ...props}) => <ul className="list-disc list-inside my-2" {...props} />,
-                ol: ({node, ...props}) => <ol className="list-decimal list-inside my-2" {...props} />,
+                h1: ({node, ...props}) => <h1 className="text-2xl font-bold my-4 text-white" {...props} />,
+                h2: ({node, ...props}) => <h2 className="text-xl font-bold my-3 text-white" {...props} />,
+                h3: ({node, ...props}) => <h3 className="text-lg font-bold my-2 text-white" {...props} />,
+                p: ({node, ...props}) => <p className="my-2 text-gray-300" {...props} />,
+                ul: ({node, ...props}) => <ul className="list-disc list-inside my-2 text-gray-300" {...props} />,
+                ol: ({node, ...props}) => <ol className="list-decimal list-inside my-2 text-gray-300" {...props} />,
                 code: ({node, inline, ...props}) => 
                   inline 
-                    ? <code className="bg-gray-100 rounded px-1" {...props} />
-                    : <pre className="bg-gray-100 rounded p-2 my-2 overflow-auto"><code {...props} /></pre>
+                    ? <code className="bg-gray-700 rounded px-1" {...props} />
+                    : <pre className="bg-gray-800 rounded p-2 my-2 overflow-auto"><code {...props} /></pre>,
+                a: ({node, ...props}) => <a className="text-blue-400 hover:underline" {...props} />
               }}
             >
               {content}
