@@ -4,8 +4,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
+import { useTheme } from 'next-themes';
 
 const SettingsDialog = () => {
+  const { theme, setTheme } = useTheme();
+
+  const handleDarkModeToggle = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
   return (
     <Dialog>
       <DialogTrigger>
@@ -18,7 +25,11 @@ const SettingsDialog = () => {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <Label htmlFor="dark-mode">Dark Mode</Label>
-            <Switch id="dark-mode" />
+            <Switch 
+              id="dark-mode" 
+              checked={theme === 'dark'}
+              onCheckedChange={handleDarkModeToggle}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="font-size">Font Size</Label>
